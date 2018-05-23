@@ -1,6 +1,10 @@
+use std::env;
+use std::fs::create_dir;
+use std::path::Path;
+
 extern crate cc;
 
-fn main {
+fn main() {
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
     let cargo_dir =  Path::new(manifest_dir.as_str());
     let lib_dir = cargo_dir.join("lib");
@@ -10,17 +14,17 @@ fn main {
         create_dir(&lib_dir).unwrap();
     }
 
-    cc::Build::new()
-        .flag("-c")
-        .file(variadic_c)
-        .flag("-fPIC")
-        .flag("-w") // Hide warnings; cc will pass them to cargo annoyingly
-        .out_dir(&lib_dir)
-        .compile("variadic");
+    // cc::Build::new()
+    //     .flag("-c")
+    //     .file(variadic_c)
+    //     .flag("-fPIC")
+    //     .flag("-w") // Hide warnings; cc will pass them to cargo annoyingly
+    //     .out_dir(&lib_dir)
+    //     .compile("variadic");
 
     // println!("cargo:rustc-link-lib=dylib=resolv");
     // println!("cargo:rustc-link-lib=ncursesw");
     println!("cargo:rustc-link-search=native={}", lib_dir.display());
     // println!("cargo:rustc-link-lib=event");
-	panic!("TODO");
+    // panic!("TODO");
 }

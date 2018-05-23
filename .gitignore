@@ -125,3 +125,7 @@ xstc/xsts-*.tar.gz
 # libxml2-rs
 compile_commands.json
 *.c.cbor
+rust/Cargo.lock
+rust/target/**
+rust/src/*.rs
+!rust/src/lib.rs
