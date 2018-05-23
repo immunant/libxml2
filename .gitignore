@@ -121,3 +121,7 @@ xstc/Makefile
 xstc/Makefile.in
 xstc/Tests
 xstc/xsts-*.tar.gz
+
+# libxml2-rs
+compile_commands.json
+*.c.cbor
