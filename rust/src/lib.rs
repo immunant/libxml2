@@ -11,6 +11,12 @@
 #![allow(dead_code)]
 #![allow(mutable_transmutes)]
 #![allow(unused_mut)]
+// The following allows are just here because lots
+// of spam is being outputted. They are not required
+#![allow(unused_unsafe)]
+#![allow(unused_parens)]
+#![allow(unused_assignments)]
+#![allow(unused_variables)]
 
 // TODO: make pub after validating necessity
 mod HTMLparser;

@@ -16,6 +16,7 @@
 
 #define IN_LIBXML
 #include "libxml.h"
+#include "variadic.h"
 
 #ifdef LIBXML_FTP_ENABLED
 #include <string.h>
@@ -82,11 +83,6 @@
 /**
  * A couple portability macros
  */
-#ifndef _WINSOCKAPI_
-#if !defined(__BEOS__) || defined(__HAIKU__)
-#define closesocket(s) close(s)
-#endif
-#endif
 
 #ifdef __BEOS__
 #ifndef PF_INET
@@ -107,33 +103,33 @@
 #define FTP_COMMAND_OK		200
 #define FTP_SYNTAX_ERROR	500
 #define FTP_GET_PASSWD		331
-#define FTP_BUF_SIZE		1024
+// #define FTP_BUF_SIZE		1024
 
 #define XML_NANO_MAX_URLBUF	4096
 
-typedef struct xmlNanoFTPCtxt {
-    char *protocol;	/* the protocol name */
-    char *hostname;	/* the host name */
-    int port;		/* the port */
-    char *path;		/* the path within the URL */
-    char *user;		/* user string */
-    char *passwd;	/* passwd string */
-#ifdef SUPPORT_IP6
-    struct sockaddr_storage ftpAddr; /* this is large enough to hold IPv6 address*/
-#else
-    struct sockaddr_in ftpAddr; /* the socket address struct */
-#endif
-    int passive;	/* currently we support only passive !!! */
-    SOCKET controlFd;	/* the file descriptor for the control socket */
-    SOCKET dataFd;	/* the file descriptor for the data socket */
-    int state;		/* WRITE / READ / CLOSED */
-    int returnValue;	/* the protocol return value */
-    /* buffer for data received from the control connection */
-    char controlBuf[FTP_BUF_SIZE + 1];
-    int controlBufIndex;
-    int controlBufUsed;
-    int controlBufAnswer;
-} xmlNanoFTPCtxt, *xmlNanoFTPCtxtPtr;
+// typedef struct xmlNanoFTPCtxt {
+//     char *protocol;	/* the protocol name */
+//     char *hostname;	/* the host name */
+//     int port;		/* the port */
+//     char *path;		/* the path within the URL */
+//     char *user;		/* user string */
+//     char *passwd;	/* passwd string */
+// #ifdef SUPPORT_IP6
+//     struct sockaddr_storage ftpAddr; /* this is large enough to hold IPv6 address*/
+// #else
+//     struct sockaddr_in ftpAddr; /* the socket address struct */
+// #endif
+//     int passive;	/* currently we support only passive !!! */
+//     SOCKET controlFd;	/* the file descriptor for the control socket */
+//     SOCKET dataFd;	/* the file descriptor for the data socket */
+//     int state;		/* WRITE / READ / CLOSED */
+//     int returnValue;	/* the protocol return value */
+//     /* buffer for data received from the control connection */
+//     char controlBuf[FTP_BUF_SIZE + 1];
+//     int controlBufIndex;
+//     int controlBufUsed;
+//     int controlBufAnswer;
+// } xmlNanoFTPCtxt, *xmlNanoFTPCtxtPtr;
 
 static int initialized = 0;
 static char *proxy = NULL;	/* the proxy name if any */
@@ -1543,45 +1539,45 @@ xmlNanoFTPGetConnection(void *ctx) {
  * Returns -1 incase of error, 0 otherwise
  */
 
-int
-xmlNanoFTPCloseConnection(void *ctx) {
-    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
-    int res;
-    fd_set rfd, efd;
-    struct timeval tv;
+// int
+// xmlNanoFTPCloseConnection(void *ctx) {
+//     xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+//     int res;
+//     fd_set rfd, efd;
+//     struct timeval tv;
 
-    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return(-1);
+//     if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return(-1);
 
-    closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
-    tv.tv_sec = 15;
-    tv.tv_usec = 0;
-    FD_ZERO(&rfd);
-    FD_SET(ctxt->controlFd, &rfd);
-    FD_ZERO(&efd);
-    FD_SET(ctxt->controlFd, &efd);
-    res = select(ctxt->controlFd + 1, &rfd, NULL, &efd, &tv);
-    if (res < 0) {
-#ifdef DEBUG_FTP
-	perror("select");
-#endif
-	closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
-	return(-1);
-    }
-    if (res == 0) {
-#ifdef DEBUG_FTP
-	xmlGenericError(xmlGenericErrorContext,
-		"xmlNanoFTPCloseConnection: timeout\n");
-#endif
-	closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
-    } else {
-	res = xmlNanoFTPGetResponse(ctxt);
-	if (res != 2) {
-	    closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
-	    return(-1);
-	}
-    }
-    return(0);
-}
+//     closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+//     tv.tv_sec = 15;
+//     tv.tv_usec = 0;
+//     FD_ZERO(&rfd);
+//     FD_SET(ctxt->controlFd, &rfd);
+//     FD_ZERO(&efd);
+//     FD_SET(ctxt->controlFd, &efd);
+//     res = select(ctxt->controlFd + 1, &rfd, NULL, &efd, &tv);
+//     if (res < 0) {
+// #ifdef DEBUG_FTP
+// 	perror("select");
+// #endif
+// 	closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
+// 	return(-1);
+//     }
+//     if (res == 0) {
+// #ifdef DEBUG_FTP
+// 	xmlGenericError(xmlGenericErrorContext,
+// 		"xmlNanoFTPCloseConnection: timeout\n");
+// #endif
+// 	closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
+//     } else {
+// 	res = xmlNanoFTPGetResponse(ctxt);
+// 	if (res != 2) {
+// 	    closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
+// 	    return(-1);
+// 	}
+//     }
+//     return(0);
+// }
 
 /**
  * xmlNanoFTPParseList:

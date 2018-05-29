@@ -2,13 +2,22 @@
 #define __LIBXML2_VARIADIC_H
 
 #include <libxml/xmlreader.h>
+#include <libxml/nanoftp.h>
 // #include <libxml/xmlwriter.h>
 
+#include <netinet/in.h>
+#include <sys/socket.h>
 #ifdef LIBXML_XINCLUDE_ENABLED
 #include <libxml/xinclude.h>
 #endif
 #ifdef LIBXML_PATTERN_ENABLED
 #include <libxml/pattern.h>
+#endif
+
+#ifndef _WINSOCKAPI_
+#if !defined(__BEOS__) || defined(__HAIKU__)
+#define closesocket(s) close(s)
+#endif
 #endif
 
 // from xmlreader.c:
@@ -95,6 +104,7 @@ struct _xmlTextReader {
     /* Structured error handling */
     xmlStructuredErrorFunc sErrorFunc;  /* callback function */
 };
+
 // from xmlschemas.c:
 struct _xmlSchemaSAXPlug {
     unsigned int magic;
@@ -109,6 +119,32 @@ struct _xmlSchemaSAXPlug {
     xmlSAXHandler         schemas_sax;
     xmlSchemaValidCtxtPtr ctxt;
 };
+
+// from nanoftp.c:
+#define FTP_BUF_SIZE		1024
+typedef struct xmlNanoFTPCtxt {
+    char *protocol;	/* the protocol name */
+    char *hostname;	/* the host name */
+    int port;		/* the port */
+    char *path;		/* the path within the URL */
+    char *user;		/* user string */
+    char *passwd;	/* passwd string */
+#ifdef SUPPORT_IP6
+    struct sockaddr_storage ftpAddr; /* this is large enough to hold IPv6 address*/
+#else
+    struct sockaddr_in ftpAddr; /* the socket address struct */
+#endif
+    int passive;	/* currently we support only passive !!! */
+    SOCKET controlFd;	/* the file descriptor for the control socket */
+    SOCKET dataFd;	/* the file descriptor for the data socket */
+    int state;		/* WRITE / READ / CLOSED */
+    int returnValue;	/* the protocol return value */
+    /* buffer for data received from the control connection */
+    char controlBuf[FTP_BUF_SIZE + 1];
+    int controlBufIndex;
+    int controlBufUsed;
+    int controlBufAnswer;
+} xmlNanoFTPCtxt, *xmlNanoFTPCtxtPtr;
 
 // from error.c:
 #define XML_GET_VAR_STR(msg, str) {				\
@@ -188,7 +224,6 @@ int XMLCDECL xmlStrPrintf(xmlChar *buf, int len, const char *msg, ...);
 // int XMLCDECL xmlTextWriterWriteFormatDTDElement(xmlTextWriterPtr writer, const xmlChar * name, const char *format, ...);
 // int XMLCDECL xmlTextWriterWriteFormatDTDAttlist(xmlTextWriterPtr writer, const xmlChar * name, const char *format, ...);
 // int XMLCDECL xmlTextWriterWriteFormatDTDInternalEntity(xmlTextWriterPtr writer, int pe, const xmlChar * name, const char *format, ...);
-
 
 
 #endif

@@ -717,3 +717,45 @@ xmlTextWriterWriteFormatDTDInternalEntity(xmlTextWriterPtr writer,
     va_end(ap);
     return rc;
 }
+
+// from nanoftp.c:
+// not really variadic, but generates ASM:
+int
+xmlNanoFTPCloseConnection(void *ctx) {
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    int res;
+    fd_set rfd, efd;
+    struct timeval tv;
+
+    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return(-1);
+
+    closesocket(ctxt->dataFd); ctxt->dataFd = INVALID_SOCKET;
+    tv.tv_sec = 15;
+    tv.tv_usec = 0;
+    FD_ZERO(&rfd);
+    FD_SET(ctxt->controlFd, &rfd);
+    FD_ZERO(&efd);
+    FD_SET(ctxt->controlFd, &efd);
+    res = select(ctxt->controlFd + 1, &rfd, NULL, &efd, &tv);
+    if (res < 0) {
+#ifdef DEBUG_FTP
+	perror("select");
+#endif
+	closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
+	return(-1);
+    }
+    if (res == 0) {
+#ifdef DEBUG_FTP
+	xmlGenericError(xmlGenericErrorContext,
+		"xmlNanoFTPCloseConnection: timeout\n");
+#endif
+	closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
+    } else {
+	res = xmlNanoFTPGetResponse(ctxt);
+	if (res != 2) {
+	    closesocket(ctxt->controlFd); ctxt->controlFd = INVALID_SOCKET;
+	    return(-1);
+	}
+    }
+    return(0);
+}
