@@ -464,5 +464,7 @@ xmlModulePlatformSymbol(void *handle, const char *name, void **symbol)
 #endif /* HAVE_OS2 */
 
 #define bottom_xmlmodule
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */
 #endif /* LIBXML_MODULES_ENABLED */

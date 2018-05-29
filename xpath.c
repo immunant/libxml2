@@ -15131,4 +15131,6 @@ xmlXPathRegisterAllFunctions(xmlXPathContextPtr ctxt)
 
 #endif /* LIBXML_XPATH_ENABLED */
 #define bottom_xpath
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */

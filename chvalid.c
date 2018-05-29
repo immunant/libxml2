@@ -333,4 +333,6 @@ xmlIsPubidChar(unsigned int ch) {
 }
 
 #define bottom_chvalid
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */

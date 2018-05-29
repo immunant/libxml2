@@ -1123,4 +1123,6 @@ __xmlOutputBufferCreateFilenameValue(void) {
 }
 
 #define bottom_globals
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */

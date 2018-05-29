@@ -2239,5 +2239,7 @@ xmlC11NNormalizeString(const xmlChar * input,
 }
 #endif /* LIBXML_OUTPUT_ENABLED */
 #define bottom_c14n
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */
 #endif /* LIBXML_C14N_ENABLED */

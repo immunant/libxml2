@@ -3050,4 +3050,6 @@ docbDefaultSAXHandlerInit(void)
 
 #endif /* LIBXML_DOCB_ENABLED */
 #define bottom_SAX2
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */

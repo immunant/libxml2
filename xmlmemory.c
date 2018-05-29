@@ -1160,4 +1160,6 @@ xmlGcMemGet(xmlFreeFunc *freeFunc, xmlMallocFunc *mallocFunc,
 }
 
 #define bottom_xmlmemory
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */

@@ -2116,4 +2116,6 @@ int main(int argc, char **argv) {
 #endif /* STANDALONE */
 #endif /* LIBXML_FTP_ENABLED */
 #define bottom_nanoftp
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */

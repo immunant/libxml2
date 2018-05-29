@@ -2152,4 +2152,6 @@ xmlKeepBlanksDefault(int val) {
 }
 
 #define bottom_parserInternals
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */

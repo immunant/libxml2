@@ -52,6 +52,7 @@
 
 #define IN_LIBXML
 #include "libxml.h"
+#include "variadic.h"
 
 #ifdef LIBXML_SCHEMAS_ENABLED
 
@@ -28275,19 +28276,19 @@ struct _xmlSchemaSplitSAXData {
 
 #define XML_SAX_PLUG_MAGIC 0xdc43ba21
 
-struct _xmlSchemaSAXPlug {
-    unsigned int magic;
+// struct _xmlSchemaSAXPlug {
+//     unsigned int magic;
 
-    /* the original callbacks informations */
-    xmlSAXHandlerPtr     *user_sax_ptr;
-    xmlSAXHandlerPtr      user_sax;
-    void                **user_data_ptr;
-    void                 *user_data;
+//     /* the original callbacks informations */
+//     xmlSAXHandlerPtr     *user_sax_ptr;
+//     xmlSAXHandlerPtr      user_sax;
+//     void                **user_data_ptr;
+//     void                 *user_data;
 
-    /* the block plugged back and validation informations */
-    xmlSAXHandler         schemas_sax;
-    xmlSchemaValidCtxtPtr ctxt;
-};
+//     /* the block plugged back and validation informations */
+//     xmlSAXHandler         schemas_sax;
+//     xmlSchemaValidCtxtPtr ctxt;
+// };
 
 /* All those functions just bounces to the user provided SAX handlers */
 static void
@@ -28483,30 +28484,30 @@ commentSplit(void *ctx, const xmlChar *value)
  * Varargs error callbacks to the user application, harder ...
  */
 
-static void XMLCDECL
-warningSplit(void *ctx, const char *msg ATTRIBUTE_UNUSED, ...) {
-    xmlSchemaSAXPlugPtr ctxt = (xmlSchemaSAXPlugPtr) ctx;
-    if ((ctxt != NULL) && (ctxt->user_sax != NULL) &&
-        (ctxt->user_sax->warning != NULL)) {
-	TODO
-    }
-}
-static void XMLCDECL
-errorSplit(void *ctx, const char *msg ATTRIBUTE_UNUSED, ...) {
-    xmlSchemaSAXPlugPtr ctxt = (xmlSchemaSAXPlugPtr) ctx;
-    if ((ctxt != NULL) && (ctxt->user_sax != NULL) &&
-        (ctxt->user_sax->error != NULL)) {
-	TODO
-    }
-}
-static void XMLCDECL
-fatalErrorSplit(void *ctx, const char *msg ATTRIBUTE_UNUSED, ...) {
-    xmlSchemaSAXPlugPtr ctxt = (xmlSchemaSAXPlugPtr) ctx;
-    if ((ctxt != NULL) && (ctxt->user_sax != NULL) &&
-        (ctxt->user_sax->fatalError != NULL)) {
-	TODO
-    }
-}
+// static void XMLCDECL
+// warningSplit(void *ctx, const char *msg ATTRIBUTE_UNUSED, ...) {
+//     xmlSchemaSAXPlugPtr ctxt = (xmlSchemaSAXPlugPtr) ctx;
+//     if ((ctxt != NULL) && (ctxt->user_sax != NULL) &&
+//         (ctxt->user_sax->warning != NULL)) {
+// 	TODO
+//     }
+// }
+// static void XMLCDECL
+// errorSplit(void *ctx, const char *msg ATTRIBUTE_UNUSED, ...) {
+//     xmlSchemaSAXPlugPtr ctxt = (xmlSchemaSAXPlugPtr) ctx;
+//     if ((ctxt != NULL) && (ctxt->user_sax != NULL) &&
+//         (ctxt->user_sax->error != NULL)) {
+// 	TODO
+//     }
+// }
+// static void XMLCDECL
+// fatalErrorSplit(void *ctx, const char *msg ATTRIBUTE_UNUSED, ...) {
+//     xmlSchemaSAXPlugPtr ctxt = (xmlSchemaSAXPlugPtr) ctx;
+//     if ((ctxt != NULL) && (ctxt->user_sax != NULL) &&
+//         (ctxt->user_sax->fatalError != NULL)) {
+// 	TODO
+//     }
+// }
 
 /*
  * Those are function where both the user handler and the schemas handler
@@ -28973,5 +28974,7 @@ xmlSchemaValidCtxtGetParserCtxt(xmlSchemaValidCtxtPtr ctxt)
 }
 
 #define bottom_xmlschemas
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */
 #endif /* LIBXML_SCHEMAS_ENABLED */

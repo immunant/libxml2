@@ -1277,5 +1277,7 @@ htmlSaveFileEnc(const char *filename, xmlDocPtr cur, const char *encoding) {
 #endif /* LIBXML_OUTPUT_ENABLED */
 
 #define bottom_HTMLtree
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */
 #endif /* LIBXML_HTML_ENABLED */

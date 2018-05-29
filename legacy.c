@@ -1338,6 +1338,8 @@ cdataBlock(void *ctx, const xmlChar * value, int len)
         xmlSAX2CDataBlock(ctx, value, len);
 }
 #define bottom_legacy
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */
 #endif /* LIBXML_LEGACY_ENABLED */
 

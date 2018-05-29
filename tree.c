@@ -10129,4 +10129,6 @@ xmlDOMWrapAdoptNode(xmlDOMWrapCtxtPtr ctxt,
 }
 
 #define bottom_tree
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */

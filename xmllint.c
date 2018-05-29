@@ -7,6 +7,8 @@
  */
 
 #include "libxml.h"
+#include "variadic.h"
+#include "xmllint_variadic.h"
 
 #include <string.h>
 #include <stdarg.h>
@@ -116,7 +118,7 @@ static int recovery = 0;
 static int noent = 0;
 static int noenc = 0;
 static int noblanks = 0;
-static int noout = 0;
+int xmllint_noout = 0;
 static int nowrap = 0;
 #ifdef LIBXML_OUTPUT_ENABLED
 static int format = 0;
@@ -164,7 +166,7 @@ static int xinclude = 0;
 #endif
 static int dtdattrs = 0;
 static int loaddtd = 0;
-static xmllintReturnCode progresult = XMLLINT_RETURN_OK;
+xmllintReturnCode progresult = XMLLINT_RETURN_OK;
 static int timing = 0;
 static int generate = 0;
 static int dropdtd = 0;
@@ -433,26 +435,26 @@ startTimer(void)
  *           message about the timing performed; format is a printf
  *           type argument
  */
-static void XMLCDECL LIBXML_ATTR_FORMAT(1,2)
-endTimer(const char *fmt, ...)
-{
-    long msec;
-    va_list ap;
+// static void XMLCDECL LIBXML_ATTR_FORMAT(1,2)
+// endTimer(const char *fmt, ...)
+// {
+//     long msec;
+//     va_list ap;
 
-    gettimeofday(&end, NULL);
-    msec = end.tv_sec - begin.tv_sec;
-    msec *= 1000;
-    msec += (end.tv_usec - begin.tv_usec) / 1000;
+//     gettimeofday(&end, NULL);
+//     msec = end.tv_sec - begin.tv_sec;
+//     msec *= 1000;
+//     msec += (end.tv_usec - begin.tv_usec) / 1000;
 
-#ifndef HAVE_STDARG_H
-#error "endTimer required stdarg functions"
-#endif
-    va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
-    va_end(ap);
+// #ifndef HAVE_STDARG_H
+// #error "endTimer required stdarg functions"
+// #endif
+//     va_start(ap, fmt);
+//     vfprintf(stderr, fmt, ap);
+//     va_end(ap);
 
-    fprintf(stderr, " took %ld ms\n", msec);
-}
+//     fprintf(stderr, " took %ld ms\n", msec);
+// }
 #elif defined(HAVE_TIME_H)
 /*
  * No gettimeofday function, so we have to make do with calling clock.
@@ -469,23 +471,23 @@ startTimer(void)
 {
     begin = clock();
 }
-static void XMLCDECL LIBXML_ATTR_FORMAT(1,2)
-endTimer(const char *fmt, ...)
-{
-    long msec;
-    va_list ap;
+// static void XMLCDECL LIBXML_ATTR_FORMAT(1,2)
+// endTimer(const char *fmt, ...)
+// {
+//     long msec;
+//     va_list ap;
 
-    end = clock();
-    msec = ((end - begin) * 1000) / CLOCKS_PER_SEC;
+//     end = clock();
+//     msec = ((end - begin) * 1000) / CLOCKS_PER_SEC;
 
-#ifndef HAVE_STDARG_H
-#error "endTimer required stdarg functions"
-#endif
-    va_start(ap, fmt);
-    vfprintf(stderr, fmt, ap);
-    va_end(ap);
-    fprintf(stderr, " took %ld ms\n", msec);
-}
+// #ifndef HAVE_STDARG_H
+// #error "endTimer required stdarg functions"
+// #endif
+//     va_start(ap, fmt);
+//     vfprintf(stderr, fmt, ap);
+//     va_end(ap);
+//     fprintf(stderr, " took %ld ms\n", msec);
+// }
 #else
 
 /*
@@ -498,42 +500,42 @@ startTimer(void)
      * Do nothing
      */
 }
-static void XMLCDECL LIBXML_ATTR_FORMAT(1,2)
-endTimer(char *format, ...)
-{
-    /*
-     * We cannot do anything because we don't have a timing function
-     */
-#ifdef HAVE_STDARG_H
-    va_list ap;
-    va_start(ap, format);
-    vfprintf(stderr, format, ap);
-    va_end(ap);
-    fprintf(stderr, " was not timed\n");
-#else
-    /* We don't have gettimeofday, time or stdarg.h, what crazy world is
-     * this ?!
-     */
-#endif
-}
+// static void XMLCDECL LIBXML_ATTR_FORMAT(1,2)
+// endTimer(char *format, ...)
+// {
+//     /*
+//      * We cannot do anything because we don't have a timing function
+//      */
+// #ifdef HAVE_STDARG_H
+//     va_list ap;
+//     va_start(ap, format);
+//     vfprintf(stderr, format, ap);
+//     va_end(ap);
+//     fprintf(stderr, " was not timed\n");
+// #else
+//     /* We don't have gettimeofday, time or stdarg.h, what crazy world is
+//      * this ?!
+//      */
+// #endif
+// }
 #endif
 /************************************************************************
  *									*
  *			HTML ouput					*
  *									*
  ************************************************************************/
-static char buffer[50000];
+char xmllint_buffer[50000];
 
-static void
+void
 xmlHTMLEncodeSend(void) {
     char *result;
 
-    result = (char *) xmlEncodeEntitiesReentrant(NULL, BAD_CAST buffer);
+    result = (char *) xmlEncodeEntitiesReentrant(NULL, BAD_CAST xmllint_buffer);
     if (result) {
 	xmlGenericError(xmlGenericErrorContext, "%s", result);
 	xmlFree(result);
     }
-    buffer[0] = 0;
+    xmllint_buffer[0] = 0;
 }
 
 /**
@@ -543,18 +545,18 @@ xmlHTMLEncodeSend(void) {
  * Displays the associated file and line informations for the current input
  */
 
-static void
+void
 xmlHTMLPrintFileInfo(xmlParserInputPtr input) {
     int len;
     xmlGenericError(xmlGenericErrorContext, "<p>");
 
-    len = strlen(buffer);
+    len = strlen(xmllint_buffer);
     if (input != NULL) {
 	if (input->filename) {
-	    snprintf(&buffer[len], sizeof(buffer) - len, "%s:%d: ", input->filename,
+	    snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "%s:%d: ", input->filename,
 		    input->line);
 	} else {
-	    snprintf(&buffer[len], sizeof(buffer) - len, "Entity: line %d: ", input->line);
+	    snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "Entity: line %d: ", input->line);
 	}
     }
     xmlHTMLEncodeSend();
@@ -567,7 +569,7 @@ xmlHTMLPrintFileInfo(xmlParserInputPtr input) {
  * Displays current context within the input content for error tracking
  */
 
-static void
+void
 xmlHTMLPrintFileContext(xmlParserInputPtr input) {
     const xmlChar *cur, *base;
     int len;
@@ -587,24 +589,24 @@ xmlHTMLPrintFileContext(xmlParserInputPtr input) {
     base = cur;
     n = 0;
     while ((*cur != 0) && (*cur != '\n') && (*cur != '\r') && (n < 79)) {
-	len = strlen(buffer);
-        snprintf(&buffer[len], sizeof(buffer) - len, "%c",
+	len = strlen(xmllint_buffer);
+        snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "%c",
 		    (unsigned char) *cur++);
 	n++;
     }
-    len = strlen(buffer);
-    snprintf(&buffer[len], sizeof(buffer) - len, "\n");
+    len = strlen(xmllint_buffer);
+    snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "\n");
     cur = input->cur;
     while ((*cur == '\n') || (*cur == '\r'))
 	cur--;
     n = 0;
     while ((cur != base) && (n++ < 80)) {
-	len = strlen(buffer);
-        snprintf(&buffer[len], sizeof(buffer) - len, " ");
+	len = strlen(xmllint_buffer);
+        snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, " ");
         base++;
     }
-    len = strlen(buffer);
-    snprintf(&buffer[len], sizeof(buffer) - len, "^\n");
+    len = strlen(xmllint_buffer);
+    snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "^\n");
     xmlHTMLEncodeSend();
     xmlGenericError(xmlGenericErrorContext, "</pre>");
 }
@@ -618,33 +620,33 @@ xmlHTMLPrintFileContext(xmlParserInputPtr input) {
  * Display and format an error messages, gives file, line, position and
  * extra parameters.
  */
-static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
-xmlHTMLError(void *ctx, const char *msg, ...)
-{
-    xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx;
-    xmlParserInputPtr input;
-    va_list args;
-    int len;
+// static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
+// xmlHTMLError(void *ctx, const char *msg, ...)
+// {
+//     xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx;
+//     xmlParserInputPtr input;
+//     va_list args;
+//     int len;
 
-    buffer[0] = 0;
-    input = ctxt->input;
-    if ((input != NULL) && (input->filename == NULL) && (ctxt->inputNr > 1)) {
-        input = ctxt->inputTab[ctxt->inputNr - 2];
-    }
+//     xmllint_buffer[0] = 0;
+//     input = ctxt->input;
+//     if ((input != NULL) && (input->filename == NULL) && (ctxt->inputNr > 1)) {
+//         input = ctxt->inputTab[ctxt->inputNr - 2];
+//     }
 
-    xmlHTMLPrintFileInfo(input);
+//     xmlHTMLPrintFileInfo(input);
 
-    xmlGenericError(xmlGenericErrorContext, "<b>error</b>: ");
-    va_start(args, msg);
-    len = strlen(buffer);
-    vsnprintf(&buffer[len],  sizeof(buffer) - len, msg, args);
-    va_end(args);
-    xmlHTMLEncodeSend();
-    xmlGenericError(xmlGenericErrorContext, "</p>\n");
+//     xmlGenericError(xmlGenericErrorContext, "<b>error</b>: ");
+//     va_start(args, msg);
+//     len = strlen(xmllint_buffer);
+//     vsnprintf(&xmllint_buffer[len],  sizeof(xmllint_buffer) - len, msg, args);
+//     va_end(args);
+//     xmlHTMLEncodeSend();
+//     xmlGenericError(xmlGenericErrorContext, "</p>\n");
 
-    xmlHTMLPrintFileContext(input);
-    xmlHTMLEncodeSend();
-}
+//     xmlHTMLPrintFileContext(input);
+//     xmlHTMLEncodeSend();
+// }
 
 /**
  * xmlHTMLWarning:
@@ -655,34 +657,34 @@ xmlHTMLError(void *ctx, const char *msg, ...)
  * Display and format a warning messages, gives file, line, position and
  * extra parameters.
  */
-static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
-xmlHTMLWarning(void *ctx, const char *msg, ...)
-{
-    xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx;
-    xmlParserInputPtr input;
-    va_list args;
-    int len;
+// static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
+// xmlHTMLWarning(void *ctx, const char *msg, ...)
+// {
+//     xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx;
+//     xmlParserInputPtr input;
+//     va_list args;
+//     int len;
 
-    buffer[0] = 0;
-    input = ctxt->input;
-    if ((input != NULL) && (input->filename == NULL) && (ctxt->inputNr > 1)) {
-        input = ctxt->inputTab[ctxt->inputNr - 2];
-    }
+//     xmllint_buffer[0] = 0;
+//     input = ctxt->input;
+//     if ((input != NULL) && (input->filename == NULL) && (ctxt->inputNr > 1)) {
+//         input = ctxt->inputTab[ctxt->inputNr - 2];
+//     }
 
 
-    xmlHTMLPrintFileInfo(input);
+//     xmlHTMLPrintFileInfo(input);
 
-    xmlGenericError(xmlGenericErrorContext, "<b>warning</b>: ");
-    va_start(args, msg);
-    len = strlen(buffer);
-    vsnprintf(&buffer[len],  sizeof(buffer) - len, msg, args);
-    va_end(args);
-    xmlHTMLEncodeSend();
-    xmlGenericError(xmlGenericErrorContext, "</p>\n");
+//     xmlGenericError(xmlGenericErrorContext, "<b>warning</b>: ");
+//     va_start(args, msg);
+//     len = strlen(xmllint_buffer);
+//     vsnprintf(&xmllint_buffer[len],  sizeof(xmllint_buffer) - len, msg, args);
+//     va_end(args);
+//     xmlHTMLEncodeSend();
+//     xmlGenericError(xmlGenericErrorContext, "</p>\n");
 
-    xmlHTMLPrintFileContext(input);
-    xmlHTMLEncodeSend();
-}
+//     xmlHTMLPrintFileContext(input);
+//     xmlHTMLEncodeSend();
+// }
 
 /**
  * xmlHTMLValidityError:
@@ -693,33 +695,33 @@ xmlHTMLWarning(void *ctx, const char *msg, ...)
  * Display and format an validity error messages, gives file,
  * line, position and extra parameters.
  */
-static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
-xmlHTMLValidityError(void *ctx, const char *msg, ...)
-{
-    xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx;
-    xmlParserInputPtr input;
-    va_list args;
-    int len;
+// static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
+// xmlHTMLValidityError(void *ctx, const char *msg, ...)
+// {
+//     xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx;
+//     xmlParserInputPtr input;
+//     va_list args;
+//     int len;
 
-    buffer[0] = 0;
-    input = ctxt->input;
-    if ((input->filename == NULL) && (ctxt->inputNr > 1))
-        input = ctxt->inputTab[ctxt->inputNr - 2];
+//     xmllint_buffer[0] = 0;
+//     input = ctxt->input;
+//     if ((input->filename == NULL) && (ctxt->inputNr > 1))
+//         input = ctxt->inputTab[ctxt->inputNr - 2];
 
-    xmlHTMLPrintFileInfo(input);
+//     xmlHTMLPrintFileInfo(input);
 
-    xmlGenericError(xmlGenericErrorContext, "<b>validity error</b>: ");
-    len = strlen(buffer);
-    va_start(args, msg);
-    vsnprintf(&buffer[len],  sizeof(buffer) - len, msg, args);
-    va_end(args);
-    xmlHTMLEncodeSend();
-    xmlGenericError(xmlGenericErrorContext, "</p>\n");
+//     xmlGenericError(xmlGenericErrorContext, "<b>validity error</b>: ");
+//     len = strlen(xmllint_buffer);
+//     va_start(args, msg);
+//     vsnprintf(&xmllint_buffer[len],  sizeof(xmllint_buffer) - len, msg, args);
+//     va_end(args);
+//     xmlHTMLEncodeSend();
+//     xmlGenericError(xmlGenericErrorContext, "</p>\n");
 
-    xmlHTMLPrintFileContext(input);
-    xmlHTMLEncodeSend();
-    progresult = XMLLINT_ERR_VALID;
-}
+//     xmlHTMLPrintFileContext(input);
+//     xmlHTMLEncodeSend();
+//     progresult = XMLLINT_ERR_VALID;
+// }
 
 /**
  * xmlHTMLValidityWarning:
@@ -730,32 +732,32 @@ xmlHTMLValidityError(void *ctx, const char *msg, ...)
  * Display and format a validity warning messages, gives file, line,
  * position and extra parameters.
  */
-static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
-xmlHTMLValidityWarning(void *ctx, const char *msg, ...)
-{
-    xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx;
-    xmlParserInputPtr input;
-    va_list args;
-    int len;
+// static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
+// xmlHTMLValidityWarning(void *ctx, const char *msg, ...)
+// {
+//     xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx;
+//     xmlParserInputPtr input;
+//     va_list args;
+//     int len;
 
-    buffer[0] = 0;
-    input = ctxt->input;
-    if ((input->filename == NULL) && (ctxt->inputNr > 1))
-        input = ctxt->inputTab[ctxt->inputNr - 2];
+//     xmllint_buffer[0] = 0;
+//     input = ctxt->input;
+//     if ((input->filename == NULL) && (ctxt->inputNr > 1))
+//         input = ctxt->inputTab[ctxt->inputNr - 2];
 
-    xmlHTMLPrintFileInfo(input);
+//     xmlHTMLPrintFileInfo(input);
 
-    xmlGenericError(xmlGenericErrorContext, "<b>validity warning</b>: ");
-    va_start(args, msg);
-    len = strlen(buffer);
-    vsnprintf(&buffer[len],  sizeof(buffer) - len, msg, args);
-    va_end(args);
-    xmlHTMLEncodeSend();
-    xmlGenericError(xmlGenericErrorContext, "</p>\n");
+//     xmlGenericError(xmlGenericErrorContext, "<b>validity warning</b>: ");
+//     va_start(args, msg);
+//     len = strlen(xmllint_buffer);
+//     vsnprintf(&xmllint_buffer[len],  sizeof(xmllint_buffer) - len, msg, args);
+//     va_end(args);
+//     xmlHTMLEncodeSend();
+//     xmlGenericError(xmlGenericErrorContext, "</p>\n");
 
-    xmlHTMLPrintFileContext(input);
-    xmlHTMLEncodeSend();
-}
+//     xmlHTMLPrintFileContext(input);
+//     xmlHTMLEncodeSend();
+// }
 
 /************************************************************************
  *									*
@@ -870,7 +872,7 @@ static xmlSAXHandler emptySAXHandlerStruct = {
 
 static xmlSAXHandlerPtr emptySAXHandler = &emptySAXHandlerStruct;
 extern xmlSAXHandlerPtr debugSAXHandler;
-static int callbacks;
+int xmllint_callbacks;
 
 /**
  * isStandaloneDebug:
@@ -883,8 +885,8 @@ static int callbacks;
 static int
 isStandaloneDebug(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return(0);
     fprintf(stdout, "SAX.isStandalone()\n");
     return(0);
@@ -901,8 +903,8 @@ isStandaloneDebug(void *ctx ATTRIBUTE_UNUSED)
 static int
 hasInternalSubsetDebug(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return(0);
     fprintf(stdout, "SAX.hasInternalSubset()\n");
     return(0);
@@ -919,8 +921,8 @@ hasInternalSubsetDebug(void *ctx ATTRIBUTE_UNUSED)
 static int
 hasExternalSubsetDebug(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return(0);
     fprintf(stdout, "SAX.hasExternalSubset()\n");
     return(0);
@@ -936,8 +938,8 @@ static void
 internalSubsetDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name,
 	       const xmlChar *ExternalID, const xmlChar *SystemID)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.internalSubset(%s,", name);
     if (ExternalID == NULL)
@@ -960,8 +962,8 @@ static void
 externalSubsetDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name,
 	       const xmlChar *ExternalID, const xmlChar *SystemID)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.externalSubset(%s,", name);
     if (ExternalID == NULL)
@@ -991,8 +993,8 @@ externalSubsetDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name,
 static xmlParserInputPtr
 resolveEntityDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *publicId, const xmlChar *systemId)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return(NULL);
     /* xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx; */
 
@@ -1021,8 +1023,8 @@ resolveEntityDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *publicId, const xm
 static xmlEntityPtr
 getEntityDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return(NULL);
     fprintf(stdout, "SAX.getEntity(%s)\n", name);
     return(NULL);
@@ -1040,8 +1042,8 @@ getEntityDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name)
 static xmlEntityPtr
 getParameterEntityDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return(NULL);
     fprintf(stdout, "SAX.getParameterEntity(%s)\n", name);
     return(NULL);
@@ -1071,8 +1073,8 @@ const xmlChar *nullstr = BAD_CAST "(null)";
         systemId = nullstr;
     if (content == NULL)
         content = (xmlChar *)nullstr;
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.entityDecl(%s, %d, %s, %s, %s)\n",
             name, type, publicId, systemId, content);
@@ -1091,8 +1093,8 @@ attributeDeclDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar * elem,
                    const xmlChar * name, int type, int def,
                    const xmlChar * defaultValue, xmlEnumerationPtr tree)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
         return;
     if (defaultValue == NULL)
         fprintf(stdout, "SAX.attributeDecl(%s, %s, %d, %d, NULL, ...)\n",
@@ -1116,8 +1118,8 @@ static void
 elementDeclDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name, int type,
 	    xmlElementContentPtr content ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.elementDecl(%s, %d, ...)\n",
             name, type);
@@ -1136,8 +1138,8 @@ static void
 notationDeclDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name,
 	     const xmlChar *publicId, const xmlChar *systemId)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.notationDecl(%s, %s, %s)\n",
             (char *) name, (char *) publicId, (char *) systemId);
@@ -1166,8 +1168,8 @@ const xmlChar *nullstr = BAD_CAST "(null)";
         systemId = nullstr;
     if (notationName == NULL)
         notationName = nullstr;
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.unparsedEntityDecl(%s, %s, %s, %s)\n",
             (char *) name, (char *) publicId, (char *) systemId,
@@ -1185,8 +1187,8 @@ const xmlChar *nullstr = BAD_CAST "(null)";
 static void
 setDocumentLocatorDebug(void *ctx ATTRIBUTE_UNUSED, xmlSAXLocatorPtr loc ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.setDocumentLocator()\n");
 }
@@ -1200,8 +1202,8 @@ setDocumentLocatorDebug(void *ctx ATTRIBUTE_UNUSED, xmlSAXLocatorPtr loc ATTRIBU
 static void
 startDocumentDebug(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.startDocument()\n");
 }
@@ -1215,8 +1217,8 @@ startDocumentDebug(void *ctx ATTRIBUTE_UNUSED)
 static void
 endDocumentDebug(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.endDocument()\n");
 }
@@ -1233,8 +1235,8 @@ startElementDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name, const xmlChar
 {
     int i;
 
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.startElement(%s", (char *) name);
     if (atts != NULL) {
@@ -1257,8 +1259,8 @@ startElementDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name, const xmlChar
 static void
 endElementDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.endElement(%s)\n", (char *) name);
 }
@@ -1278,8 +1280,8 @@ charactersDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *ch, int len)
     char out[40];
     int i;
 
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     for (i = 0;(i<len) && (i < 30);i++)
 	out[i] = ch[i];
@@ -1298,8 +1300,8 @@ charactersDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *ch, int len)
 static void
 referenceDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.reference(%s)\n", name);
 }
@@ -1320,8 +1322,8 @@ ignorableWhitespaceDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *ch, int len)
     char out[40];
     int i;
 
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     for (i = 0;(i<len) && (i < 30);i++)
 	out[i] = ch[i];
@@ -1342,8 +1344,8 @@ static void
 processingInstructionDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *target,
                       const xmlChar *data)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     if (data != NULL)
 	fprintf(stdout, "SAX.processingInstruction(%s, %s)\n",
@@ -1364,8 +1366,8 @@ processingInstructionDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *target,
 static void
 cdataBlockDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *value, int len)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.pcdata(%.20s, %d)\n",
 	    (char *) value, len);
@@ -1381,8 +1383,8 @@ cdataBlockDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *value, int len)
 static void
 commentDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *value)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.comment(%s)\n", value);
 }
@@ -1396,19 +1398,19 @@ commentDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *value)
  * Display and format a warning messages, gives file, line, position and
  * extra parameters.
  */
-static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
-warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
-{
-    va_list args;
+// static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
+// warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+// {
+//     va_list args;
 
-    callbacks++;
-    if (noout)
-	return;
-    va_start(args, msg);
-    fprintf(stdout, "SAX.warning: ");
-    vfprintf(stdout, msg, args);
-    va_end(args);
-}
+//     xmllint_callbacks++;
+//     if (xmllint_noout)
+// 	return;
+//     va_start(args, msg);
+//     fprintf(stdout, "SAX.warning: ");
+//     vfprintf(stdout, msg, args);
+//     va_end(args);
+// }
 
 /**
  * errorDebug:
@@ -1419,19 +1421,19 @@ warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
  * Display and format a error messages, gives file, line, position and
  * extra parameters.
  */
-static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
-errorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
-{
-    va_list args;
+// static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
+// errorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+// {
+//     va_list args;
 
-    callbacks++;
-    if (noout)
-	return;
-    va_start(args, msg);
-    fprintf(stdout, "SAX.error: ");
-    vfprintf(stdout, msg, args);
-    va_end(args);
-}
+//     xmllint_callbacks++;
+//     if (xmllint_noout)
+// 	return;
+//     va_start(args, msg);
+//     fprintf(stdout, "SAX.error: ");
+//     vfprintf(stdout, msg, args);
+//     va_end(args);
+// }
 
 /**
  * fatalErrorDebug:
@@ -1442,19 +1444,19 @@ errorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
  * Display and format a fatalError messages, gives file, line, position and
  * extra parameters.
  */
-static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
-fatalErrorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
-{
-    va_list args;
+// static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
+// fatalErrorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+// {
+//     va_list args;
 
-    callbacks++;
-    if (noout)
-	return;
-    va_start(args, msg);
-    fprintf(stdout, "SAX.fatalError: ");
-    vfprintf(stdout, msg, args);
-    va_end(args);
-}
+//     xmllint_callbacks++;
+//     if (xmllint_noout)
+// 	return;
+//     va_start(args, msg);
+//     fprintf(stdout, "SAX.fatalError: ");
+//     vfprintf(stdout, msg, args);
+//     va_end(args);
+// }
 
 static xmlSAXHandler debugSAXHandlerStruct = {
     internalSubsetDebug,
@@ -1516,8 +1518,8 @@ startElementNsDebug(void *ctx ATTRIBUTE_UNUSED,
 {
     int i;
 
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.startElementNs(%s", (char *) localname);
     if (prefix == NULL)
@@ -1566,8 +1568,8 @@ endElementNsDebug(void *ctx ATTRIBUTE_UNUSED,
                   const xmlChar *prefix,
                   const xmlChar *URI)
 {
-    callbacks++;
-    if (noout)
+    xmllint_callbacks++;
+    if (xmllint_noout)
 	return;
     fprintf(stdout, "SAX.endElementNs(%s", (char *) localname);
     if (prefix == NULL)
@@ -1626,9 +1628,9 @@ testSAX(const char *filename) {
     xmlParserCtxtPtr ctxt = NULL;
     xmlSAXHandlerPtr old_sax = NULL;
 
-    callbacks = 0;
+    xmllint_callbacks = 0;
 
-    if (noout) {
+    if (xmllint_noout) {
         handler = emptySAXHandler;
 #ifdef LIBXML_SAX1_ENABLED
     } else if (sax1) {
@@ -2503,7 +2505,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
     }
 #endif /* LIBXML_READER_ENABLED */
 #ifdef LIBXML_OUTPUT_ENABLED
-    if (noout == 0) {
+    if (xmllint_noout == 0) {
         int ret;
 
 	/*
@@ -2823,7 +2825,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	    flag = XML_SCHEMATRON_OUT_XML;
 	else
 	    flag = XML_SCHEMATRON_OUT_TEXT;
-	if (noout)
+	if (xmllint_noout)
 	    flag |= XML_SCHEMATRON_OUT_QUIET;
 	ctxt = xmlSchematronNewValidCtxt(wxschematron, flag);
 #if 0
@@ -3137,7 +3139,7 @@ main(int argc, char **argv) {
 	if ((!strcmp(argv[i], "-shell")) ||
 	         (!strcmp(argv[i], "--shell"))) {
 	    shell++;
-            noout = 1;
+            xmllint_noout = 1;
         } else
 #endif
 #ifdef LIBXML_TREE_ENABLED
@@ -3175,7 +3177,7 @@ main(int argc, char **argv) {
 	    version = 1;
 	} else if ((!strcmp(argv[i], "-noout")) ||
 	         (!strcmp(argv[i], "--noout")))
-	    noout++;
+	    xmllint_noout++;
 #ifdef LIBXML_OUTPUT_ENABLED
 	else if ((!strcmp(argv[i], "-o")) ||
 	         (!strcmp(argv[i], "-output")) ||
@@ -3402,7 +3404,7 @@ main(int argc, char **argv) {
 	else if ((!strcmp(argv[i], "-walker")) ||
 	         (!strcmp(argv[i], "--walker"))) {
 	     walker++;
-             noout++;
+             xmllint_noout++;
 	}
 #endif /* LIBXML_READER_ENABLED */
 #ifdef LIBXML_SAX1_ENABLED
@@ -3463,7 +3465,7 @@ main(int argc, char **argv) {
         } else if ((!strcmp(argv[i], "-xpath")) ||
                    (!strcmp(argv[i], "--xpath"))) {
 	    i++;
-	    noout++;
+	    xmllint_noout++;
 	    xpathquery = argv[i];
 #endif
 	} else if ((!strcmp(argv[i], "-oldxml10")) ||

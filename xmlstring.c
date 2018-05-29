@@ -15,6 +15,7 @@
 
 #define IN_LIBXML
 #include "libxml.h"
+#include "variadic.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -545,22 +546,22 @@ xmlStrcat(xmlChar *cur, const xmlChar *add) {
  *
  * Returns the number of characters written to @buf or -1 if an error occurs.
  */
-int XMLCDECL
-xmlStrPrintf(xmlChar *buf, int len, const char *msg, ...) {
-    va_list args;
-    int ret;
+// int XMLCDECL
+// xmlStrPrintf(xmlChar *buf, int len, const char *msg, ...) {
+//     va_list args;
+//     int ret;
 
-    if((buf == NULL) || (msg == NULL)) {
-        return(-1);
-    }
+//     if((buf == NULL) || (msg == NULL)) {
+//         return(-1);
+//     }
 
-    va_start(args, msg);
-    ret = vsnprintf((char *) buf, len, (const char *) msg, args);
-    va_end(args);
-    buf[len - 1] = 0; /* be safe ! */
+//     va_start(args, msg);
+//     ret = vsnprintf((char *) buf, len, (const char *) msg, args);
+//     va_end(args);
+//     buf[len - 1] = 0; /* be safe ! */
 
-    return(ret);
-}
+//     return(ret);
+// }
 
 /**
  * xmlStrVPrintf:
@@ -1044,4 +1045,6 @@ xmlEscapeFormatString(xmlChar **msg)
 }
 
 #define bottom_xmlstring
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */

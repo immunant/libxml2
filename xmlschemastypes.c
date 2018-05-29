@@ -6158,5 +6158,7 @@ xmlSchemaGetValType(xmlSchemaValPtr val)
 }
 
 #define bottom_xmlschemastypes
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */
 #endif /* LIBXML_SCHEMAS_ENABLED */

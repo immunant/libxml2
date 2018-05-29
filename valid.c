@@ -9,6 +9,7 @@
 
 #define IN_LIBXML
 #include "libxml.h"
+#include "variadic.h"
 
 #include <string.h>
 
@@ -6956,10 +6957,6 @@ xmlValidGetPotentialChildren(xmlElementContent *ctree,
 /*
  * Dummy function to suppress messages while we try out valid elements
  */
-static void XMLCDECL xmlNoValidityErr(void *ctx ATTRIBUTE_UNUSED,
-                                const char *msg ATTRIBUTE_UNUSED, ...) {
-    return;
-}
 
 /**
  * xmlValidGetValidElements:
@@ -7093,4 +7090,6 @@ xmlValidGetValidElements(xmlNode *prev, xmlNode *next, const xmlChar **names,
 #endif /* LIBXML_VALID_ENABLED */
 
 #define bottom_valid
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */

@@ -16,6 +16,7 @@
  */
 #define IN_LIBXML
 #include "libxml.h"
+#include "variadic.h"
 
 #ifdef LIBXML_READER_ENABLED
 #include <string.h> /* for memset() only ! */
@@ -101,90 +102,90 @@
 #define XML_TEXTREADER_INPUT	1
 #define XML_TEXTREADER_CTXT	2
 
-typedef enum {
-    XML_TEXTREADER_NONE = -1,
-    XML_TEXTREADER_START= 0,
-    XML_TEXTREADER_ELEMENT= 1,
-    XML_TEXTREADER_END= 2,
-    XML_TEXTREADER_EMPTY= 3,
-    XML_TEXTREADER_BACKTRACK= 4,
-    XML_TEXTREADER_DONE= 5,
-    XML_TEXTREADER_ERROR= 6
-} xmlTextReaderState;
+// typedef enum {
+//     XML_TEXTREADER_NONE = -1,
+//     XML_TEXTREADER_START= 0,
+//     XML_TEXTREADER_ELEMENT= 1,
+//     XML_TEXTREADER_END= 2,
+//     XML_TEXTREADER_EMPTY= 3,
+//     XML_TEXTREADER_BACKTRACK= 4,
+//     XML_TEXTREADER_DONE= 5,
+//     XML_TEXTREADER_ERROR= 6
+// } xmlTextReaderState;
 
-typedef enum {
-    XML_TEXTREADER_NOT_VALIDATE = 0,
-    XML_TEXTREADER_VALIDATE_DTD = 1,
-    XML_TEXTREADER_VALIDATE_RNG = 2,
-    XML_TEXTREADER_VALIDATE_XSD = 4
-} xmlTextReaderValidate;
+// typedef enum {
+//     XML_TEXTREADER_NOT_VALIDATE = 0,
+//     XML_TEXTREADER_VALIDATE_DTD = 1,
+//     XML_TEXTREADER_VALIDATE_RNG = 2,
+//     XML_TEXTREADER_VALIDATE_XSD = 4
+// } xmlTextReaderValidate;
 
-struct _xmlTextReader {
-    int				mode;	/* the parsing mode */
-    xmlDocPtr			doc;    /* when walking an existing doc */
-    xmlTextReaderValidate       validate;/* is there any validation */
-    int				allocs;	/* what structure were deallocated */
-    xmlTextReaderState		state;
-    xmlParserCtxtPtr		ctxt;	/* the parser context */
-    xmlSAXHandlerPtr		sax;	/* the parser SAX callbacks */
-    xmlParserInputBufferPtr	input;	/* the input */
-    startElementSAXFunc		startElement;/* initial SAX callbacks */
-    endElementSAXFunc		endElement;  /* idem */
-    startElementNsSAX2Func	startElementNs;/* idem */
-    endElementNsSAX2Func	endElementNs;  /* idem */
-    charactersSAXFunc		characters;
-    cdataBlockSAXFunc		cdataBlock;
-    unsigned int		base;	/* base of the segment in the input */
-    unsigned int		cur;	/* current position in the input */
-    xmlNodePtr			node;	/* current node */
-    xmlNodePtr			curnode;/* current attribute node */
-    int				depth;  /* depth of the current node */
-    xmlNodePtr			faketext;/* fake xmlNs chld */
-    int				preserve;/* preserve the resulting document */
-    xmlBufPtr		        buffer; /* used to return const xmlChar * */
-    xmlDictPtr			dict;	/* the context dictionary */
+// struct _xmlTextReader {
+//     int				mode;	/* the parsing mode */
+//     xmlDocPtr			doc;    /* when walking an existing doc */
+//     xmlTextReaderValidate       validate;/* is there any validation */
+//     int				allocs;	/* what structure were deallocated */
+//     xmlTextReaderState		state;
+//     xmlParserCtxtPtr		ctxt;	/* the parser context */
+//     xmlSAXHandlerPtr		sax;	/* the parser SAX callbacks */
+//     xmlParserInputBufferPtr	input;	/* the input */
+//     startElementSAXFunc		startElement;/* initial SAX callbacks */
+//     endElementSAXFunc		endElement;  /* idem */
+//     startElementNsSAX2Func	startElementNs;/* idem */
+//     endElementNsSAX2Func	endElementNs;  /* idem */
+//     charactersSAXFunc		characters;
+//     cdataBlockSAXFunc		cdataBlock;
+//     unsigned int		base;	/* base of the segment in the input */
+//     unsigned int		cur;	/* current position in the input */
+//     xmlNodePtr			node;	/* current node */
+//     xmlNodePtr			curnode;/* current attribute node */
+//     int				depth;  /* depth of the current node */
+//     xmlNodePtr			faketext;/* fake xmlNs chld */
+//     int				preserve;/* preserve the resulting document */
+//     xmlBufPtr		        buffer; /* used to return const xmlChar * */
+//     xmlDictPtr			dict;	/* the context dictionary */
 
-    /* entity stack when traversing entities content */
-    xmlNodePtr         ent;          /* Current Entity Ref Node */
-    int                entNr;        /* Depth of the entities stack */
-    int                entMax;       /* Max depth of the entities stack */
-    xmlNodePtr        *entTab;       /* array of entities */
+//     /* entity stack when traversing entities content */
+//     xmlNodePtr         ent;          /* Current Entity Ref Node */
+//     int                entNr;        /* Depth of the entities stack */
+//     int                entMax;       /* Max depth of the entities stack */
+//     xmlNodePtr        *entTab;       /* array of entities */
 
-    /* error handling */
-    xmlTextReaderErrorFunc errorFunc;    /* callback function */
-    void                  *errorFuncArg; /* callback function user argument */
+//     /* error handling */
+//     xmlTextReaderErrorFunc errorFunc;    /* callback function */
+//     void                  *errorFuncArg; /* callback function user argument */
 
-#ifdef LIBXML_SCHEMAS_ENABLED
-    /* Handling of RelaxNG validation */
-    xmlRelaxNGPtr          rngSchemas;	/* The Relax NG schemas */
-    xmlRelaxNGValidCtxtPtr rngValidCtxt;/* The Relax NG validation context */
-    int                    rngPreserveCtxt; /* 1 if the context was provided by the user */
-    int                    rngValidErrors;/* The number of errors detected */
-    xmlNodePtr             rngFullNode;	/* the node if RNG not progressive */
-    /* Handling of Schemas validation */
-    xmlSchemaPtr          xsdSchemas;	/* The Schemas schemas */
-    xmlSchemaValidCtxtPtr xsdValidCtxt;/* The Schemas validation context */
-    int                   xsdPreserveCtxt; /* 1 if the context was provided by the user */
-    int                   xsdValidErrors;/* The number of errors detected */
-    xmlSchemaSAXPlugPtr   xsdPlug;	/* the schemas plug in SAX pipeline */
-#endif
-#ifdef LIBXML_XINCLUDE_ENABLED
-    /* Handling of XInclude processing */
-    int                xinclude;	/* is xinclude asked for */
-    const xmlChar *    xinclude_name;	/* the xinclude name from dict */
-    xmlXIncludeCtxtPtr xincctxt;	/* the xinclude context */
-    int                in_xinclude;	/* counts for xinclude */
-#endif
-#ifdef LIBXML_PATTERN_ENABLED
-    int                patternNr;       /* number of preserve patterns */
-    int                patternMax;      /* max preserve patterns */
-    xmlPatternPtr     *patternTab;      /* array of preserve patterns */
-#endif
-    int                preserves;	/* level of preserves */
-    int                parserFlags;	/* the set of options set */
-    /* Structured error handling */
-    xmlStructuredErrorFunc sErrorFunc;  /* callback function */
-};
+// #ifdef LIBXML_SCHEMAS_ENABLED
+//     /* Handling of RelaxNG validation */
+//     xmlRelaxNGPtr          rngSchemas;	/* The Relax NG schemas */
+//     xmlRelaxNGValidCtxtPtr rngValidCtxt;/* The Relax NG validation context */
+//     int                    rngPreserveCtxt; /* 1 if the context was provided by the user */
+//     int                    rngValidErrors;/* The number of errors detected */
+//     xmlNodePtr             rngFullNode;	/* the node if RNG not progressive */
+//     /* Handling of Schemas validation */
+//     xmlSchemaPtr          xsdSchemas;	/* The Schemas schemas */
+//     xmlSchemaValidCtxtPtr xsdValidCtxt;/* The Schemas validation context */
+//     int                   xsdPreserveCtxt; /* 1 if the context was provided by the user */
+//     int                   xsdValidErrors;/* The number of errors detected */
+//     xmlSchemaSAXPlugPtr   xsdPlug;	/* the schemas plug in SAX pipeline */
+// #endif
+// #ifdef LIBXML_XINCLUDE_ENABLED
+//     /* Handling of XInclude processing */
+//     int                xinclude;	/* is xinclude asked for */
+//     const xmlChar *    xinclude_name;	/* the xinclude name from dict */
+//     xmlXIncludeCtxtPtr xincctxt;	/* the xinclude context */
+//     int                in_xinclude;	/* counts for xinclude */
+// #endif
+// #ifdef LIBXML_PATTERN_ENABLED
+//     int                patternNr;       /* number of preserve patterns */
+//     int                patternMax;      /* max preserve patterns */
+//     xmlPatternPtr     *patternTab;      /* array of preserve patterns */
+// #endif
+//     int                preserves;	/* level of preserves */
+//     int                parserFlags;	/* the set of options set */
+//     /* Structured error handling */
+//     xmlStructuredErrorFunc sErrorFunc;  /* callback function */
+// };
 
 #define NODE_IS_EMPTY		0x1
 #define NODE_IS_PRESERVED	0x2
@@ -4055,65 +4056,65 @@ xmlTextReaderCurrentDoc(xmlTextReaderPtr reader) {
 }
 
 #ifdef LIBXML_SCHEMAS_ENABLED
-static char *xmlTextReaderBuildMessage(const char *msg, va_list ap) LIBXML_ATTR_FORMAT(1,0);
+// static char *xmlTextReaderBuildMessage(const char *msg, va_list ap) LIBXML_ATTR_FORMAT(1,0);
 
-static void XMLCDECL
-xmlTextReaderValidityError(void *ctxt, const char *msg, ...) LIBXML_ATTR_FORMAT(2,3);
+// static void XMLCDECL
+// xmlTextReaderValidityError(void *ctxt, const char *msg, ...) LIBXML_ATTR_FORMAT(2,3);
 
-static void XMLCDECL
-xmlTextReaderValidityWarning(void *ctxt, const char *msg, ...) LIBXML_ATTR_FORMAT(2,3);
+// static void XMLCDECL
+// xmlTextReaderValidityWarning(void *ctxt, const char *msg, ...) LIBXML_ATTR_FORMAT(2,3);
 
-static void XMLCDECL
-xmlTextReaderValidityErrorRelay(void *ctx, const char *msg, ...) LIBXML_ATTR_FORMAT(2,3);
+// static void XMLCDECL
+// xmlTextReaderValidityErrorRelay(void *ctx, const char *msg, ...) LIBXML_ATTR_FORMAT(2,3);
 
-static void XMLCDECL
-xmlTextReaderValidityWarningRelay(void *ctx, const char *msg, ...) LIBXML_ATTR_FORMAT(2,3);
+// static void XMLCDECL
+// xmlTextReaderValidityWarningRelay(void *ctx, const char *msg, ...) LIBXML_ATTR_FORMAT(2,3);
 
-static void XMLCDECL
-xmlTextReaderValidityErrorRelay(void *ctx, const char *msg, ...)
-{
-    xmlTextReaderPtr reader = (xmlTextReaderPtr) ctx;
+// static void XMLCDECL
+// xmlTextReaderValidityErrorRelay(void *ctx, const char *msg, ...)
+// {
+//     xmlTextReaderPtr reader = (xmlTextReaderPtr) ctx;
 
-    char *str;
+//     char *str;
 
-    va_list ap;
+//     va_list ap;
 
-    va_start(ap, msg);
-    str = xmlTextReaderBuildMessage(msg, ap);
-    if (!reader->errorFunc) {
-        xmlTextReaderValidityError(ctx, "%s", str);
-    } else {
-        reader->errorFunc(reader->errorFuncArg, str,
-                          XML_PARSER_SEVERITY_VALIDITY_ERROR,
-                          NULL /* locator */ );
-    }
-    if (str != NULL)
-        xmlFree(str);
-    va_end(ap);
-}
+//     va_start(ap, msg);
+//     str = xmlTextReaderBuildMessage(msg, ap);
+//     if (!reader->errorFunc) {
+//         xmlTextReaderValidityError(ctx, "%s", str);
+//     } else {
+//         reader->errorFunc(reader->errorFuncArg, str,
+//                           XML_PARSER_SEVERITY_VALIDITY_ERROR,
+//                           NULL /* locator */ );
+//     }
+//     if (str != NULL)
+//         xmlFree(str);
+//     va_end(ap);
+// }
 
-static void XMLCDECL
-xmlTextReaderValidityWarningRelay(void *ctx, const char *msg, ...)
-{
-    xmlTextReaderPtr reader = (xmlTextReaderPtr) ctx;
+// static void XMLCDECL
+// xmlTextReaderValidityWarningRelay(void *ctx, const char *msg, ...)
+// {
+//     xmlTextReaderPtr reader = (xmlTextReaderPtr) ctx;
 
-    char *str;
+//     char *str;
 
-    va_list ap;
+//     va_list ap;
 
-    va_start(ap, msg);
-    str = xmlTextReaderBuildMessage(msg, ap);
-    if (!reader->errorFunc) {
-        xmlTextReaderValidityWarning(ctx, "%s", str);
-    } else {
-        reader->errorFunc(reader->errorFuncArg, str,
-                          XML_PARSER_SEVERITY_VALIDITY_WARNING,
-                          NULL /* locator */ );
-    }
-    if (str != NULL)
-        xmlFree(str);
-    va_end(ap);
-}
+//     va_start(ap, msg);
+//     str = xmlTextReaderBuildMessage(msg, ap);
+//     if (!reader->errorFunc) {
+//         xmlTextReaderValidityWarning(ctx, "%s", str);
+//     } else {
+//         reader->errorFunc(reader->errorFuncArg, str,
+//                           XML_PARSER_SEVERITY_VALIDITY_WARNING,
+//                           NULL /* locator */ );
+//     }
+//     if (str != NULL)
+//         xmlFree(str);
+//     va_end(ap);
+// }
 
 static void
   xmlTextReaderStructuredError(void *ctxt, xmlErrorPtr error);
@@ -4724,7 +4725,7 @@ xmlTextReaderStandalone(xmlTextReaderPtr reader) {
  ************************************************************************/
 
 /* helper to build a xmlMalloc'ed string from a format and va_list */
-static char *
+char *
 xmlTextReaderBuildMessage(const char *msg, va_list ap) {
     int size = 0;
     int chars;
@@ -4833,7 +4834,7 @@ xmlTextReaderLocatorBaseURI(xmlTextReaderLocatorPtr locator) {
     return ret;
 }
 
-static void
+void
 xmlTextReaderGenericError(void *ctxt, xmlParserSeverities severity,
                           char *str)
 {
@@ -4861,70 +4862,70 @@ xmlTextReaderStructuredError(void *ctxt, xmlErrorPtr error)
     }
 }
 
-static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
-xmlTextReaderError(void *ctxt, const char *msg, ...)
-{
-    va_list ap;
+// static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
+// xmlTextReaderError(void *ctxt, const char *msg, ...)
+// {
+//     va_list ap;
 
-    va_start(ap, msg);
-    xmlTextReaderGenericError(ctxt,
-                              XML_PARSER_SEVERITY_ERROR,
-                              xmlTextReaderBuildMessage(msg, ap));
-    va_end(ap);
+//     va_start(ap, msg);
+//     xmlTextReaderGenericError(ctxt,
+//                               XML_PARSER_SEVERITY_ERROR,
+//                               xmlTextReaderBuildMessage(msg, ap));
+//     va_end(ap);
 
-}
+// }
 
-static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
-xmlTextReaderWarning(void *ctxt, const char *msg, ...)
-{
-    va_list ap;
+// static void XMLCDECL LIBXML_ATTR_FORMAT(2,3)
+// xmlTextReaderWarning(void *ctxt, const char *msg, ...)
+// {
+//     va_list ap;
 
-    va_start(ap, msg);
-    xmlTextReaderGenericError(ctxt,
-                              XML_PARSER_SEVERITY_WARNING,
-                              xmlTextReaderBuildMessage(msg, ap));
-    va_end(ap);
-}
+//     va_start(ap, msg);
+//     xmlTextReaderGenericError(ctxt,
+//                               XML_PARSER_SEVERITY_WARNING,
+//                               xmlTextReaderBuildMessage(msg, ap));
+//     va_end(ap);
+// }
 
-static void XMLCDECL
-xmlTextReaderValidityError(void *ctxt, const char *msg, ...)
-{
-    va_list ap;
+// static void XMLCDECL
+// xmlTextReaderValidityError(void *ctxt, const char *msg, ...)
+// {
+//     va_list ap;
 
-    int len = xmlStrlen((const xmlChar *) msg);
+//     int len = xmlStrlen((const xmlChar *) msg);
 
-    if ((len > 1) && (msg[len - 2] != ':')) {
-        /*
-         * some callbacks only report locator information:
-         * skip them (mimicking behaviour in error.c)
-         */
-        va_start(ap, msg);
-        xmlTextReaderGenericError(ctxt,
-                                  XML_PARSER_SEVERITY_VALIDITY_ERROR,
-                                  xmlTextReaderBuildMessage(msg, ap));
-        va_end(ap);
-    }
-}
+//     if ((len > 1) && (msg[len - 2] != ':')) {
+//         /*
+//          * some callbacks only report locator information:
+//          * skip them (mimicking behaviour in error.c)
+//          */
+//         va_start(ap, msg);
+//         xmlTextReaderGenericError(ctxt,
+//                                   XML_PARSER_SEVERITY_VALIDITY_ERROR,
+//                                   xmlTextReaderBuildMessage(msg, ap));
+//         va_end(ap);
+//     }
+// }
 
-static void XMLCDECL
-xmlTextReaderValidityWarning(void *ctxt, const char *msg, ...)
-{
-    va_list ap;
+// static void XMLCDECL
+// xmlTextReaderValidityWarning(void *ctxt, const char *msg, ...)
+// {
+//     va_list ap;
 
-    int len = xmlStrlen((const xmlChar *) msg);
+//     int len = xmlStrlen((const xmlChar *) msg);
 
-    if ((len != 0) && (msg[len - 1] != ':')) {
-        /*
-         * some callbacks only report locator information:
-         * skip them (mimicking behaviour in error.c)
-         */
-        va_start(ap, msg);
-        xmlTextReaderGenericError(ctxt,
-                                  XML_PARSER_SEVERITY_VALIDITY_WARNING,
-                                  xmlTextReaderBuildMessage(msg, ap));
-        va_end(ap);
-    }
-}
+//     if ((len != 0) && (msg[len - 1] != ':')) {
+//         /*
+//          * some callbacks only report locator information:
+//          * skip them (mimicking behaviour in error.c)
+//          */
+//         va_start(ap, msg);
+//         xmlTextReaderGenericError(ctxt,
+//                                   XML_PARSER_SEVERITY_VALIDITY_WARNING,
+//                                   xmlTextReaderBuildMessage(msg, ap));
+//         va_end(ap);
+//     }
+// }
 
 /**
  * xmlTextReaderSetErrorHandler:
@@ -5957,5 +5958,7 @@ main(int argc, char **argv)
 #endif
 #endif /* NOT_USED_YET */
 #define bottom_xmlreader
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */
 #endif /* LIBXML_READER_ENABLED */

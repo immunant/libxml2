@@ -1783,5 +1783,7 @@ main(void)
 }
 #endif
 #define bottom_schematron
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */
 #endif /* LIBXML_SCHEMATRON_ENABLED */

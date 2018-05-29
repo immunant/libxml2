@@ -10,6 +10,7 @@
 
 #define IN_LIBXML
 #include "libxml.h"
+#include "variadic.h"
 #include <string.h>
 
 #include <libxml/xmlmemory.h>
@@ -863,20 +864,20 @@ xmlTextWriterEndComment(xmlTextWriterPtr writer)
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatComment(xmlTextWriterPtr writer,
-                                const char *format, ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatComment(xmlTextWriterPtr writer,
+//                                 const char *format, ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatComment(writer, format, ap);
+//     rc = xmlTextWriterWriteVFormatComment(writer, format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatComment:
@@ -1291,20 +1292,20 @@ xmlTextWriterFullEndElement(xmlTextWriterPtr writer)
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatRaw(xmlTextWriterPtr writer, const char *format,
-                            ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatRaw(xmlTextWriterPtr writer, const char *format,
+//                             ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatRaw(writer, format, ap);
+//     rc = xmlTextWriterWriteVFormatRaw(writer, format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatRaw:
@@ -1417,23 +1418,23 @@ xmlTextWriterWriteRaw(xmlTextWriterPtr writer, const xmlChar * content)
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatString(xmlTextWriterPtr writer, const char *format,
-                               ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatString(xmlTextWriterPtr writer, const char *format,
+//                                ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    if ((writer == NULL) || (format == NULL))
-        return -1;
+//     if ((writer == NULL) || (format == NULL))
+//         return -1;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatString(writer, format, ap);
+//     rc = xmlTextWriterWriteVFormatString(writer, format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatString:
@@ -1963,21 +1964,21 @@ xmlTextWriterEndAttribute(xmlTextWriterPtr writer)
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatAttribute(xmlTextWriterPtr writer,
-                                  const xmlChar * name, const char *format,
-                                  ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatAttribute(xmlTextWriterPtr writer,
+//                                   const xmlChar * name, const char *format,
+//                                   ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatAttribute(writer, name, format, ap);
+//     rc = xmlTextWriterWriteVFormatAttribute(writer, name, format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatAttribute:
@@ -2058,24 +2059,24 @@ xmlTextWriterWriteAttribute(xmlTextWriterPtr writer, const xmlChar * name,
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatAttributeNS(xmlTextWriterPtr writer,
-                                    const xmlChar * prefix,
-                                    const xmlChar * name,
-                                    const xmlChar * namespaceURI,
-                                    const char *format, ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatAttributeNS(xmlTextWriterPtr writer,
+//                                     const xmlChar * prefix,
+//                                     const xmlChar * name,
+//                                     const xmlChar * namespaceURI,
+//                                     const char *format, ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatAttributeNS(writer, prefix, name,
-                                              namespaceURI, format, ap);
+//     rc = xmlTextWriterWriteVFormatAttributeNS(writer, prefix, name,
+//                                               namespaceURI, format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatAttributeNS:
@@ -2166,21 +2167,21 @@ xmlTextWriterWriteAttributeNS(xmlTextWriterPtr writer,
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatElement(xmlTextWriterPtr writer,
-                                const xmlChar * name, const char *format,
-                                ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatElement(xmlTextWriterPtr writer,
+//                                 const xmlChar * name, const char *format,
+//                                 ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatElement(writer, name, format, ap);
+//     rc = xmlTextWriterWriteVFormatElement(writer, name, format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatElement:
@@ -2263,24 +2264,24 @@ xmlTextWriterWriteElement(xmlTextWriterPtr writer, const xmlChar * name,
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatElementNS(xmlTextWriterPtr writer,
-                                  const xmlChar * prefix,
-                                  const xmlChar * name,
-                                  const xmlChar * namespaceURI,
-                                  const char *format, ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatElementNS(xmlTextWriterPtr writer,
+//                                   const xmlChar * prefix,
+//                                   const xmlChar * name,
+//                                   const xmlChar * namespaceURI,
+//                                   const char *format, ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatElementNS(writer, prefix, name,
-                                            namespaceURI, format, ap);
+//     rc = xmlTextWriterWriteVFormatElementNS(writer, prefix, name,
+//                                             namespaceURI, format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatElementNS:
@@ -2520,20 +2521,20 @@ xmlTextWriterEndPI(xmlTextWriterPtr writer)
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatPI(xmlTextWriterPtr writer, const xmlChar * target,
-                           const char *format, ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatPI(xmlTextWriterPtr writer, const xmlChar * target,
+//                            const char *format, ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatPI(writer, target, format, ap);
+//     rc = xmlTextWriterWriteVFormatPI(writer, target, format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatPI:
@@ -2735,20 +2736,20 @@ xmlTextWriterEndCDATA(xmlTextWriterPtr writer)
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatCDATA(xmlTextWriterPtr writer, const char *format,
-                              ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatCDATA(xmlTextWriterPtr writer, const char *format,
+//                               ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatCDATA(writer, format, ap);
+//     rc = xmlTextWriterWriteVFormatCDATA(writer, format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatCDATA:
@@ -3044,23 +3045,23 @@ xmlTextWriterEndDTD(xmlTextWriterPtr writer)
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatDTD(xmlTextWriterPtr writer,
-                            const xmlChar * name,
-                            const xmlChar * pubid,
-                            const xmlChar * sysid, const char *format, ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatDTD(xmlTextWriterPtr writer,
+//                             const xmlChar * name,
+//                             const xmlChar * pubid,
+//                             const xmlChar * sysid, const char *format, ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatDTD(writer, name, pubid, sysid, format,
-                                      ap);
+//     rc = xmlTextWriterWriteVFormatDTD(writer, name, pubid, sysid, format,
+//                                       ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatDTD:
@@ -3288,21 +3289,21 @@ xmlTextWriterEndDTDElement(xmlTextWriterPtr writer)
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatDTDElement(xmlTextWriterPtr writer,
-                                   const xmlChar * name,
-                                   const char *format, ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatDTDElement(xmlTextWriterPtr writer,
+//                                    const xmlChar * name,
+//                                    const char *format, ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatDTDElement(writer, name, format, ap);
+//     rc = xmlTextWriterWriteVFormatDTDElement(writer, name, format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatDTDElement:
@@ -3525,21 +3526,21 @@ xmlTextWriterEndDTDAttlist(xmlTextWriterPtr writer)
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatDTDAttlist(xmlTextWriterPtr writer,
-                                   const xmlChar * name,
-                                   const char *format, ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatDTDAttlist(xmlTextWriterPtr writer,
+//                                    const xmlChar * name,
+//                                    const char *format, ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatDTDAttlist(writer, name, format, ap);
+//     rc = xmlTextWriterWriteVFormatDTDAttlist(writer, name, format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatDTDAttlist:
@@ -3783,23 +3784,23 @@ xmlTextWriterEndDTDEntity(xmlTextWriterPtr writer)
  *
  * Returns the bytes written (may be 0 because of buffering) or -1 in case of error
  */
-int XMLCDECL
-xmlTextWriterWriteFormatDTDInternalEntity(xmlTextWriterPtr writer,
-                                          int pe,
-                                          const xmlChar * name,
-                                          const char *format, ...)
-{
-    int rc;
-    va_list ap;
+// int XMLCDECL
+// xmlTextWriterWriteFormatDTDInternalEntity(xmlTextWriterPtr writer,
+//                                           int pe,
+//                                           const xmlChar * name,
+//                                           const char *format, ...)
+// {
+//     int rc;
+//     va_list ap;
 
-    va_start(ap, format);
+//     va_start(ap, format);
 
-    rc = xmlTextWriterWriteVFormatDTDInternalEntity(writer, pe, name,
-                                                    format, ap);
+//     rc = xmlTextWriterWriteVFormatDTDInternalEntity(writer, pe, name,
+//                                                     format, ap);
 
-    va_end(ap);
-    return rc;
-}
+//     va_end(ap);
+//     return rc;
+// }
 
 /**
  * xmlTextWriterWriteVFormatDTDInternalEntity:
@@ -4734,5 +4735,7 @@ xmlTextWriterHandleStateDependencies(xmlTextWriterPtr writer,
 }
 
 #define bottom_xmlwriter
+#ifdef __INCLUDE_ELFGCCHACK
 #include "elfgcchack.h"
+#endif /* __INCLUDE_ELFGCCHACK */
 #endif
