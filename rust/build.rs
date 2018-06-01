@@ -6,25 +6,28 @@ extern crate cc;
 
 fn main() {
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    let cargo_dir =  Path::new(manifest_dir.as_str());
+    let cargo_dir = Path::new(manifest_dir.as_str());
     let lib_dir = cargo_dir.join("lib");
     let variadic_c = cargo_dir.join("../variadic.c");
+    let xmllint_variadic_c = cargo_dir.join("../xmllint_variadic.c");
+    let libxml2_include_dir = cargo_dir.join("../include");
+    let libvariadic_a = lib_dir.join("libvariadic.a");
+
+    println!("cargo:rustc-link-lib=lzma");
+    println!("cargo:rustc-link-lib=z");
+    println!("cargo:rustc-link-search=native={}", lib_dir.display());
 
     if !lib_dir.is_dir() {
         create_dir(&lib_dir).unwrap();
     }
 
-    // cc::Build::new()
-    //     .flag("-c")
-    //     .file(variadic_c)
-    //     .flag("-fPIC")
-    //     .flag("-w") // Hide warnings; cc will pass them to cargo annoyingly
-    //     .out_dir(&lib_dir)
-    //     .compile("variadic");
-
-    // println!("cargo:rustc-link-lib=dylib=resolv");
-    // println!("cargo:rustc-link-lib=ncursesw");
-    println!("cargo:rustc-link-search=native={}", lib_dir.display());
-    // println!("cargo:rustc-link-lib=event");
-    // panic!("TODO");
+    cc::Build::new()
+        .flag("-c")
+        .file(variadic_c)
+        .file(xmllint_variadic_c)
+        .flag("-fPIC")
+        .flag("-w") // Hide warnings; cc will pass them to cargo annoyingly
+        .include(libxml2_include_dir)
+        .out_dir(&lib_dir)
+        .compile("variadic");
 }

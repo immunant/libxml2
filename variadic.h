@@ -16,6 +16,7 @@
 
 #ifndef _WINSOCKAPI_
 #if !defined(__BEOS__) || defined(__HAIKU__)
+#include <sys/socket.h>
 #define closesocket(s) close(s)
 #endif
 #endif
@@ -200,6 +201,7 @@ void XMLCDECL LIBXML_ATTR_FORMAT(2,3) xmlTextReaderError(void *ctxt, const char 
 void XMLCDECL LIBXML_ATTR_FORMAT(2,3) xmlTextReaderWarning(void *ctxt, const char *msg, ...);
 void XMLCDECL xmlTextReaderValidityError(void *ctxt, const char *msg, ...);
 void XMLCDECL xmlTextReaderValidityWarning(void *ctxt, const char *msg, ...);
+char *xmlTextReaderBuildMessage(const char *msg, va_list ap);
 
 // from xmlchemas.c:
 void XMLCDECL warningSplit(void *ctx, const char *msg ATTRIBUTE_UNUSED, ...);
@@ -207,7 +209,7 @@ void XMLCDECL errorSplit(void *ctx, const char *msg ATTRIBUTE_UNUSED, ...);
 void XMLCDECL fatalErrorSplit(void *ctx, const char *msg ATTRIBUTE_UNUSED, ...);
 
 // from xmlstring.c:
-int XMLCDECL xmlStrPrintf(xmlChar *buf, int len, const char *msg, ...);
+// int XMLCDECL xmlStrPrintf(xmlChar *buf, int len, const char *msg, ...);
 
 // from xmlwriter.c:
 // already in include/libxml/xmlwriter.h?:

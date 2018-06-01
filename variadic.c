@@ -354,6 +354,25 @@ void XMLCDECL xmlNoValidityErr(void *ctx ATTRIBUTE_UNUSED,
 }
 
 // from xmlreader.c:
+#define MAX_ERR_MSG_SIZE 64000
+#define HAVE_VA_COPY
+#ifndef VA_COPY
+  #ifdef HAVE_VA_COPY
+    #define VA_COPY(dest, src) va_copy(dest, src)
+  #else
+    #ifdef HAVE___VA_COPY
+      #define VA_COPY(dest,src) __va_copy(dest, src)
+    #else
+      #ifndef VA_LIST_IS_ARRAY
+        #define VA_COPY(dest,src) (dest) = (src)
+      #else
+        #include <string.h>
+        #define VA_COPY(dest,src) memcpy((char *)(dest),(char *)(src),sizeof(va_list))
+      #endif
+    #endif
+  #endif
+#endif
+
 void XMLCDECL
 xmlTextReaderValidityErrorRelay(void *ctx, const char *msg, ...)
 {
@@ -463,6 +482,41 @@ xmlTextReaderValidityWarning(void *ctxt, const char *msg, ...)
                                   xmlTextReaderBuildMessage(msg, ap));
         va_end(ap);
     }
+}
+char *
+xmlTextReaderBuildMessage(const char *msg, va_list ap) {
+    int size = 0;
+    int chars;
+    char *larger;
+    char *str = NULL;
+    va_list aq;
+
+    while (1) {
+        VA_COPY(aq, ap);
+        chars = vsnprintf(str, size, msg, aq);
+        va_end(aq);
+        if (chars < 0) {
+	    xmlGenericError(xmlGenericErrorContext, "vsnprintf failed !\n");
+	    if (str)
+		xmlFree(str);
+	    return NULL;
+	}
+	if ((chars < size) || (size == MAX_ERR_MSG_SIZE))
+            break;
+        if (chars < MAX_ERR_MSG_SIZE)
+	size = chars + 1;
+	else
+		size = MAX_ERR_MSG_SIZE;
+        if ((larger = (char *) xmlRealloc(str, size)) == NULL) {
+	    xmlGenericError(xmlGenericErrorContext, "xmlRealloc failed !\n");
+	    if (str)
+                xmlFree(str);
+            return NULL;
+        }
+        str = larger;
+    }
+
+    return str;
 }
 
 // from xmlchemas.c:

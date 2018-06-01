@@ -47,7 +47,7 @@
 
 #include "buf.h"
 
-#define MAX_ERR_MSG_SIZE 64000
+// #define MAX_ERR_MSG_SIZE 64000
 
 /*
  * The following VA_COPY was coded following an example in
@@ -4725,41 +4725,41 @@ xmlTextReaderStandalone(xmlTextReaderPtr reader) {
  ************************************************************************/
 
 /* helper to build a xmlMalloc'ed string from a format and va_list */
-char *
-xmlTextReaderBuildMessage(const char *msg, va_list ap) {
-    int size = 0;
-    int chars;
-    char *larger;
-    char *str = NULL;
-    va_list aq;
+// char *
+// xmlTextReaderBuildMessage(const char *msg, va_list ap) {
+//     int size = 0;
+//     int chars;
+//     char *larger;
+//     char *str = NULL;
+//     va_list aq;
 
-    while (1) {
-        VA_COPY(aq, ap);
-        chars = vsnprintf(str, size, msg, aq);
-        va_end(aq);
-        if (chars < 0) {
-	    xmlGenericError(xmlGenericErrorContext, "vsnprintf failed !\n");
-	    if (str)
-		xmlFree(str);
-	    return NULL;
-	}
-	if ((chars < size) || (size == MAX_ERR_MSG_SIZE))
-            break;
-        if (chars < MAX_ERR_MSG_SIZE)
-	size = chars + 1;
-	else
-		size = MAX_ERR_MSG_SIZE;
-        if ((larger = (char *) xmlRealloc(str, size)) == NULL) {
-	    xmlGenericError(xmlGenericErrorContext, "xmlRealloc failed !\n");
-	    if (str)
-                xmlFree(str);
-            return NULL;
-        }
-        str = larger;
-    }
+//     while (1) {
+//         VA_COPY(aq, ap);
+//         chars = vsnprintf(str, size, msg, aq);
+//         va_end(aq);
+//         if (chars < 0) {
+// 	    xmlGenericError(xmlGenericErrorContext, "vsnprintf failed !\n");
+// 	    if (str)
+// 		xmlFree(str);
+// 	    return NULL;
+// 	}
+// 	if ((chars < size) || (size == MAX_ERR_MSG_SIZE))
+//             break;
+//         if (chars < MAX_ERR_MSG_SIZE)
+// 	size = chars + 1;
+// 	else
+// 		size = MAX_ERR_MSG_SIZE;
+//         if ((larger = (char *) xmlRealloc(str, size)) == NULL) {
+// 	    xmlGenericError(xmlGenericErrorContext, "xmlRealloc failed !\n");
+// 	    if (str)
+//                 xmlFree(str);
+//             return NULL;
+//         }
+//         str = larger;
+//     }
 
-    return str;
-}
+//     return str;
+// }
 
 /**
  * xmlTextReaderLocatorLineNumber:
