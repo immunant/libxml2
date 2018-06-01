@@ -5,6 +5,7 @@
 #![feature(const_ptr_null_mut)]
 #![feature(extern_types)]
 #![feature(asm)]
+#![feature(used)]
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
@@ -17,6 +18,7 @@
 #![allow(unused_parens)]
 #![allow(unused_assignments)]
 #![allow(unused_variables)]
+#![allow(unused_attributes)]
 
 // TODO: make pub after validating necessity
 mod HTMLparser;
@@ -26,42 +28,41 @@ mod SAX2;
 mod buf;
 mod c14n;
 mod catalog;
-mod chvalid;
+pub mod chvalid;
 mod debugXML;
-mod dict;
+pub mod dict;
 mod encoding;
-mod entities;
+pub mod entities;
 mod error;
 mod globals;
-mod hash;
+pub mod hash;
 mod legacy;
-mod list;
+pub mod list;
 mod nanoftp;
 mod nanohttp;
-mod parser;
-mod parserInternals;
-mod pattern;
+pub mod parser;
+pub mod parserInternals;
+pub mod pattern;
 mod relaxng;
 mod schematron;
 mod testdso;
-mod threads;
-mod tree;
-mod uri;
-mod valid;
+pub mod threads;
+pub mod tree;
+pub mod uri;
+pub mod valid;
 mod xinclude;
 mod xlink;
 mod xmlIO;
 mod xmlcatalog;
-mod xmllint;
 mod xmlmemory;
 mod xmlmodule;
 mod xmlreader;
-mod xmlregexp;
+pub mod xmlregexp;
 mod xmlsave;
-mod xmlschemas;
-mod xmlschemastypes;
-mod xmlstring;
-mod xmlunicode;
+pub mod xmlschemas;
+pub mod xmlschemastypes;
+pub mod xmlstring;
+pub mod xmlunicode;
 mod xmlwriter;
 mod xpath;
 mod xpointer;

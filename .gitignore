@@ -128,4 +128,6 @@ compile_commands.json
 rust/Cargo.lock
 rust/target/**
 rust/src/*.rs
+rust/lib/**
+rust/examples/**
 !rust/src/lib.rs
