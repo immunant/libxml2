@@ -2,6 +2,7 @@
 #include <libxml/xmlversion.h>
 #include <libxml/xmlerror.h>
 #include <string.h>
+#include "xmllint_variadic.h"
 
 // Structure declarations
 // from xmllint.c:
