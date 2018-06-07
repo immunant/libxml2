@@ -479,6 +479,11 @@ extern "C" {
  */
     XMLPUBFUN int XMLCALL xmlTextWriterFlush(xmlTextWriterPtr writer);
 
+/*
+ * Used by variadic.c
+ */
+    void xmlWriterErrMsg(xmlTextWriterPtr ctxt, xmlParserErrors error, const char *msg);
+
 #ifdef __cplusplus
 }
 #endif

@@ -131,7 +131,7 @@ static int
  *
  * Handle a writer error
  */
-static void
+void
 xmlWriterErrMsg(xmlTextWriterPtr ctxt, xmlParserErrors error,
                const char *msg)
 {
