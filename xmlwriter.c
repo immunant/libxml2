@@ -114,7 +114,7 @@ static int xmlTextWriterWriteDocCallback(void *context,
                                          const char *str, int len);
 static int xmlTextWriterCloseDocCallback(void *context);
 
-static xmlChar *xmlTextWriterVSprintf(const char *format, va_list argptr) LIBXML_ATTR_FORMAT(1,0);
+xmlChar *xmlTextWriterVSprintf(const char *format, va_list argptr) LIBXML_ATTR_FORMAT(1,0);
 static int xmlOutputBufferWriteBase64(xmlOutputBufferPtr out, int len,
                                       const unsigned char *data);
 static void xmlTextWriterStartDocumentCallback(void *ctx);
@@ -4465,40 +4465,40 @@ xmlTextWriterCloseDocCallback(void *context)
  *
  * Returns a new xmlChar buffer with the data or NULL on error. This buffer must be freed.
  */
-static xmlChar *
-xmlTextWriterVSprintf(const char *format, va_list argptr)
-{
-    int size;
-    int count;
-    xmlChar *buf;
-    va_list locarg;
+// smlChar *
+// xmlTextWriterVSprintf(const char *format, va_list argptr)
+// {
+//     int size;
+//     int count;
+//     xmlChar *buf;
+//     va_list locarg;
 
-    size = BUFSIZ;
-    buf = (xmlChar *) xmlMalloc(size);
-    if (buf == NULL) {
-        xmlWriterErrMsg(NULL, XML_ERR_NO_MEMORY,
-                        "xmlTextWriterVSprintf : out of memory!\n");
-        return NULL;
-    }
+//     size = BUFSIZ;
+//     buf = (xmlChar *) xmlMalloc(size);
+//     if (buf == NULL) {
+//         xmlWriterErrMsg(NU_ERR_NO_MEMORY,
+//                         "xmlTextWriterVSprintf : out of memory!\n");
+//         return NULL;
+//     }
 
-    VA_COPY(locarg, argptr);
-    while (((count = vsnprintf((char *) buf, size, format, locarg)) < 0)
-           || (count == size - 1) || (count == size) || (count > size)) {
-	va_end(locarg);
-        xmlFree(buf);
-        size += BUFSIZ;
-        buf = (xmlChar *) xmlMalloc(size);
-        if (buf == NULL) {
-            xmlWriterErrMsg(NULL, XML_ERR_NO_MEMORY,
-                            "xmlTextWriterVSprintf : out of memory!\n");
-            return NULL;
-        }
-	VA_COPY(locarg, argptr);
-    }
-    va_end(locarg);
+//     VA_COPY(locarg, argptr);
+//     while (((count = vsnprintf((char *) buf, size, format, locarg)) < 0)
+//            || (count == size - 1) || (count == size) || (count > size)) {
+// 	va_end(locarg);
+//         xmlFree(buf);
+//         size += BUFSIZ;
+//         buf = (xmlChar *) xmlMalloc(size);
+//         if (buf == NULL) {
+//             xmlWriterErrMsg(NU_ERR_NO_MEMORY,
+//                             "xmlTextWriterVSprintf : out of memory!\n");
+//             return NULL;
+//         }
+// 	VA_COPY(locarg, argptr);
+//     }
+//     va_end(locarg);
 
-    return buf;
-}
+//     return buf;
+// }
 
 /**
  * xmlTextWriterStartDocumentCallback:

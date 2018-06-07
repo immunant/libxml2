@@ -771,6 +771,40 @@ xmlTextWriterWriteFormatDTDInternalEntity(xmlTextWriterPtr writer,
     va_end(ap);
     return rc;
 }
+xmlChar *
+xmlTextWriterVSprintf(const char *format, va_list argptr)
+{
+    int size;
+    int count;
+    xmlChar *buf;
+    va_list locarg;
+
+    size = BUFSIZ;
+    buf = (xmlChar *) xmlMalloc(size);
+    if (buf == NULL) {
+        xmlWriterErrMsg(NULL, XML_ERR_NO_MEMORY,
+                        "xmlTextWriterVSprintf : out of memory!\n");
+        return NULL;
+    }
+
+    VA_COPY(locarg, argptr);
+    while (((count = vsnprintf((char *) buf, size, format, locarg)) < 0)
+           || (count == size - 1) || (count == size) || (count > size)) {
+	va_end(locarg);
+        xmlFree(buf);
+        size += BUFSIZ;
+        buf = (xmlChar *) xmlMalloc(size);
+        if (buf == NULL) {
+            xmlWriterErrMsg(NULL, XML_ERR_NO_MEMORY,
+                            "xmlTextWriterVSprintf : out of memory!\n");
+            return NULL;
+        }
+	VA_COPY(locarg, argptr);
+    }
+    va_end(locarg);
+
+    return buf;
+}
 
 // from nanoftp.c:
 // not really variadic, but generates ASM:
