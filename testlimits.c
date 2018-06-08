@@ -30,6 +30,8 @@
 #include <libxml/xmlreader.h>
 #endif
 
+#include "variadic.h"
+
 static int verbose = 0;
 static int tests_quiet = 0;
 
@@ -395,34 +397,6 @@ testExternalEntityLoader(const char *URL, const char *ID,
     return(ret);
 }
 
-/*
- * Trapping the error messages at the generic level to grab the equivalent of
- * stderr messages on CLI tools.
- */
-static char testErrors[32769];
-static int testErrorsSize = 0;
-
-static void XMLCDECL
-channel(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...) {
-    va_list args;
-    int res;
-
-    if (testErrorsSize >= 32768)
-        return;
-    va_start(args, msg);
-    res = vsnprintf(&testErrors[testErrorsSize],
-                    32768 - testErrorsSize,
-		    msg, args);
-    va_end(args);
-    if (testErrorsSize + res >= 32768) {
-        /* buffer is full */
-	testErrorsSize = 32768;
-	testErrors[testErrorsSize] = 0;
-    } else {
-        testErrorsSize += res;
-    }
-    testErrors[testErrorsSize] = 0;
-}
 
 /**
  * xmlParserPrintFileContext:
@@ -529,79 +503,79 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
         }
         if (input != NULL) {
             if (input->filename)
-                channel(data, "%s:%d: ", input->filename, input->line);
+                channel_testlimits(data, "%s:%d: ", input->filename, input->line);
             else if ((line != 0) && (domain == XML_FROM_PARSER))
-                channel(data, "Entity: line %d: ", input->line);
+                channel_testlimits(data, "Entity: line %d: ", input->line);
         }
     } else {
         if (file != NULL)
-            channel(data, "%s:%d: ", file, line);
+            channel_testlimits(data, "%s:%d: ", file, line);
         else if ((line != 0) && (domain == XML_FROM_PARSER))
-            channel(data, "Entity: line %d: ", line);
+            channel_testlimits(data, "Entity: line %d: ", line);
     }
     if (name != NULL) {
-        channel(data, "element %s: ", name);
+        channel_testlimits(data, "element %s: ", name);
     }
     if (code == XML_ERR_OK)
         return;
     switch (domain) {
         case XML_FROM_PARSER:
-            channel(data, "parser ");
+            channel_testlimits(data, "parser ");
             break;
         case XML_FROM_NAMESPACE:
-            channel(data, "namespace ");
+            channel_testlimits(data, "namespace ");
             break;
         case XML_FROM_DTD:
         case XML_FROM_VALID:
-            channel(data, "validity ");
+            channel_testlimits(data, "validity ");
             break;
         case XML_FROM_HTML:
-            channel(data, "HTML parser ");
+            channel_testlimits(data, "HTML parser ");
             break;
         case XML_FROM_MEMORY:
-            channel(data, "memory ");
+            channel_testlimits(data, "memory ");
             break;
         case XML_FROM_OUTPUT:
-            channel(data, "output ");
+            channel_testlimits(data, "output ");
             break;
         case XML_FROM_IO:
-            channel(data, "I/O ");
+            channel_testlimits(data, "I/O ");
             break;
         case XML_FROM_XINCLUDE:
-            channel(data, "XInclude ");
+            channel_testlimits(data, "XInclude ");
             break;
         case XML_FROM_XPATH:
-            channel(data, "XPath ");
+            channel_testlimits(data, "XPath ");
             break;
         case XML_FROM_XPOINTER:
-            channel(data, "parser ");
+            channel_testlimits(data, "parser ");
             break;
         case XML_FROM_REGEXP:
-            channel(data, "regexp ");
+            channel_testlimits(data, "regexp ");
             break;
         case XML_FROM_MODULE:
-            channel(data, "module ");
+            channel_testlimits(data, "module ");
             break;
         case XML_FROM_SCHEMASV:
-            channel(data, "Schemas validity ");
+            channel_testlimits(data, "Schemas validity ");
             break;
         case XML_FROM_SCHEMASP:
-            channel(data, "Schemas parser ");
+            channel_testlimits(data, "Schemas parser ");
             break;
         case XML_FROM_RELAXNGP:
-            channel(data, "Relax-NG parser ");
+            channel_testlimits(data, "Relax-NG parser ");
             break;
         case XML_FROM_RELAXNGV:
-            channel(data, "Relax-NG validity ");
+            channel_testlimits(data, "Relax-NG validity ");
             break;
         case XML_FROM_CATALOG:
-            channel(data, "Catalog ");
+            channel_testlimits(data, "Catalog ");
             break;
         case XML_FROM_C14N:
-            channel(data, "C14N ");
+            channel_testlimits(data, "C14N ");
             break;
         case XML_FROM_XSLT:
-            channel(data, "XSLT ");
+            channel_testlimits(data, "XSLT ");
             break;
         default:
             break;
@@ -610,16 +584,16 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
         return;
     switch (level) {
         case XML_ERR_NONE:
-            channel(data, ": ");
+            channel_testlimits(data, ": ");
             break;
         case XML_ERR_WARNING:
-            channel(data, "warning : ");
+            channel_testlimits(data, "warning : ");
             break;
         case XML_ERR_ERROR:
-            channel(data, "error : ");
+            channel_testlimits(data, "error : ");
             break;
         case XML_ERR_FATAL:
-            channel(data, "error : ");
+            channel_testlimits(data, "error : ");
             break;
     }
     if (code == XML_ERR_OK)
@@ -628,23 +602,23 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
         int len;
 	len = xmlStrlen((const xmlChar *)str);
 	if ((len > 0) && (str[len - 1] != '\n'))
-	    channel(data, "%s\n", str);
+	    channel_testlimits(data, "%s\n", str);
 	else
-	    channel(data, "%s", str);
+	    channel_testlimits(data, "%s", str);
     } else {
-        channel(data, "%s\n", "out of memory error");
+        channel_testlimits(data, "%s\n", "out of memory error");
     }
     if (code == XML_ERR_OK)
         return;
 
     if (ctxt != NULL) {
-        xmlParserPrintFileContextInternal(input, channel, data);
+        xmlParserPrintFileContextInternal(input, channel_testlimits, data);
         if (cur != NULL) {
             if (cur->filename)
-                channel(data, "%s:%d: \n", cur->filename, cur->line);
+                channel_testlimits(data, "%s:%d: \n", cur->filename, cur->line);
             else if ((line != 0) && (domain == XML_FROM_PARSER))
-                channel(data, "Entity: line %d: \n", cur->line);
-            xmlParserPrintFileContextInternal(cur, channel, data);
+                channel_testlimits(data, "Entity: line %d: \n", cur->line);
+            xmlParserPrintFileContextInternal(cur, channel_testlimits, data);
         }
     }
     if ((domain == XML_FROM_XPATH) && (err->str1 != NULL) &&
@@ -653,12 +627,12 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
 	xmlChar buf[150];
 	int i;
 
-	channel(data, "%s\n", err->str1);
+	channel_testlimits(data, "%s\n", err->str1);
 	for (i=0;i < err->int1;i++)
 	     buf[i] = ' ';
 	buf[i++] = '^';
 	buf[i] = 0;
-	channel(data, "%s\n", buf);
+	channel_testlimits(data, "%s\n", buf);
     }
 }
 
@@ -688,11 +662,10 @@ initializeLibxml2(void) {
 
 /************************************************************************
  *									*
- *		SAX empty callbacks                                     *
+ *		SAX empty callbacks_testlimits                                     *
  *									*
  ************************************************************************/
 
-unsigned long callbacks = 0;
 
 /**
  * isStandaloneCallback:
@@ -705,7 +678,7 @@ unsigned long callbacks = 0;
 static int
 isStandaloneCallback(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return (0);
 }
 
@@ -720,7 +693,7 @@ isStandaloneCallback(void *ctx ATTRIBUTE_UNUSED)
 static int
 hasInternalSubsetCallback(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return (0);
 }
 
@@ -735,7 +708,7 @@ hasInternalSubsetCallback(void *ctx ATTRIBUTE_UNUSED)
 static int
 hasExternalSubsetCallback(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return (0);
 }
 
@@ -751,7 +724,7 @@ internalSubsetCallback(void *ctx ATTRIBUTE_UNUSED,
                        const xmlChar * ExternalID ATTRIBUTE_UNUSED,
                        const xmlChar * SystemID ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -767,7 +740,7 @@ externalSubsetCallback(void *ctx ATTRIBUTE_UNUSED,
                        const xmlChar * ExternalID ATTRIBUTE_UNUSED,
                        const xmlChar * SystemID ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -790,7 +763,7 @@ resolveEntityCallback(void *ctx ATTRIBUTE_UNUSED,
                       const xmlChar * publicId ATTRIBUTE_UNUSED,
                       const xmlChar * systemId ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return (NULL);
 }
 
@@ -807,7 +780,7 @@ static xmlEntityPtr
 getEntityCallback(void *ctx ATTRIBUTE_UNUSED,
                   const xmlChar * name ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return (NULL);
 }
 
@@ -824,7 +797,7 @@ static xmlEntityPtr
 getParameterEntityCallback(void *ctx ATTRIBUTE_UNUSED,
                            const xmlChar * name ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return (NULL);
 }
 
@@ -848,7 +821,7 @@ entityDeclCallback(void *ctx ATTRIBUTE_UNUSED,
                    const xmlChar * systemId ATTRIBUTE_UNUSED,
                    xmlChar * content ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -868,7 +841,7 @@ attributeDeclCallback(void *ctx ATTRIBUTE_UNUSED,
                       const xmlChar * defaultValue ATTRIBUTE_UNUSED,
                       xmlEnumerationPtr tree ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -887,7 +860,7 @@ elementDeclCallback(void *ctx ATTRIBUTE_UNUSED,
                     int type ATTRIBUTE_UNUSED,
                     xmlElementContentPtr content ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -906,7 +879,7 @@ notationDeclCallback(void *ctx ATTRIBUTE_UNUSED,
                      const xmlChar * publicId ATTRIBUTE_UNUSED,
                      const xmlChar * systemId ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -927,7 +900,7 @@ unparsedEntityDeclCallback(void *ctx ATTRIBUTE_UNUSED,
                            const xmlChar * systemId ATTRIBUTE_UNUSED,
                            const xmlChar * notationName ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -943,7 +916,7 @@ static void
 setDocumentLocatorCallback(void *ctx ATTRIBUTE_UNUSED,
                            xmlSAXLocatorPtr loc ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -956,7 +929,7 @@ setDocumentLocatorCallback(void *ctx ATTRIBUTE_UNUSED,
 static void
 startDocumentCallback(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -969,7 +942,7 @@ startDocumentCallback(void *ctx ATTRIBUTE_UNUSED)
 static void
 endDocumentCallback(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -986,7 +959,7 @@ startElementCallback(void *ctx ATTRIBUTE_UNUSED,
                      const xmlChar * name ATTRIBUTE_UNUSED,
                      const xmlChar ** atts ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -1001,7 +974,7 @@ static void
 endElementCallback(void *ctx ATTRIBUTE_UNUSED,
                    const xmlChar * name ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 #endif
@@ -1020,7 +993,7 @@ charactersCallback(void *ctx ATTRIBUTE_UNUSED,
                    const xmlChar * ch ATTRIBUTE_UNUSED,
                    int len ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -1035,7 +1008,7 @@ static void
 referenceCallback(void *ctx ATTRIBUTE_UNUSED,
                   const xmlChar * name ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -1054,7 +1027,7 @@ ignorableWhitespaceCallback(void *ctx ATTRIBUTE_UNUSED,
                             const xmlChar * ch ATTRIBUTE_UNUSED,
                             int len ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -1072,7 +1045,7 @@ processingInstructionCallback(void *ctx ATTRIBUTE_UNUSED,
                               const xmlChar * target ATTRIBUTE_UNUSED,
                               const xmlChar * data ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -1089,7 +1062,7 @@ cdataBlockCallback(void *ctx ATTRIBUTE_UNUSED,
                    const xmlChar * value ATTRIBUTE_UNUSED,
                    int len ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -1104,63 +1077,12 @@ static void
 commentCallback(void *ctx ATTRIBUTE_UNUSED,
                 const xmlChar * value ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
-
-/**
- * warningCallback:
- * @ctxt:  An XML parser context
- * @msg:  the message to display/transmit
- * @...:  extra parameters for the message display
- *
- * Display and format a warning messages, gives file, line, position and
- * extra parameters.
- */
-static void XMLCDECL
-warningCallback(void *ctx ATTRIBUTE_UNUSED,
-                const char *msg ATTRIBUTE_UNUSED, ...)
-{
-    callbacks++;
-    return;
-}
-
-/**
- * errorCallback:
- * @ctxt:  An XML parser context
- * @msg:  the message to display/transmit
- * @...:  extra parameters for the message display
- *
- * Display and format a error messages, gives file, line, position and
- * extra parameters.
- */
-static void XMLCDECL
-errorCallback(void *ctx ATTRIBUTE_UNUSED, const char *msg ATTRIBUTE_UNUSED,
-              ...)
-{
-    callbacks++;
-    return;
-}
-
-/**
- * fatalErrorCallback:
- * @ctxt:  An XML parser context
- * @msg:  the message to display/transmit
- * @...:  extra parameters for the message display
- *
- * Display and format a fatalError messages, gives file, line, position and
- * extra parameters.
- */
-static void XMLCDECL
-fatalErrorCallback(void *ctx ATTRIBUTE_UNUSED,
-                   const char *msg ATTRIBUTE_UNUSED, ...)
-{
-    return;
-}
-
 
 /*
- * SAX2 specific callbacks
+ * SAX2 specific callbacks_testlimits
  */
 
 /**
@@ -1181,7 +1103,7 @@ startElementNsCallback(void *ctx ATTRIBUTE_UNUSED,
                        int nb_defaulted ATTRIBUTE_UNUSED,
                        const xmlChar ** attributes ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -1198,7 +1120,7 @@ endElementNsCallback(void *ctx ATTRIBUTE_UNUSED,
                      const xmlChar * prefix ATTRIBUTE_UNUSED,
                      const xmlChar * URI ATTRIBUTE_UNUSED)
 {
-    callbacks++;
+    callbacks_testlimits++;
     return;
 }
 
@@ -1224,9 +1146,9 @@ static xmlSAXHandler callbackSAX2HandlerStruct = {
     ignorableWhitespaceCallback,
     processingInstructionCallback,
     commentCallback,
-    warningCallback,
-    errorCallback,
-    fatalErrorCallback,
+    warningCallback_testlimits,
+    errorCallback_testlimits,
+    fatalErrorCallback_testlimits,
     getParameterEntityCallback,
     cdataBlockCallback,
     externalSubsetCallback,

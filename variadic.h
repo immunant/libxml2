@@ -227,5 +227,14 @@ void XMLCDECL fatalErrorSplit(void *ctx, const char *msg ATTRIBUTE_UNUSED, ...);
 // int XMLCDECL xmlTextWriterWriteFormatDTDAttlist(xmlTextWriterPtr writer, const xmlChar * name, const char *format, ...);
 // int XMLCDECL xmlTextWriterWriteFormatDTDInternalEntity(xmlTextWriterPtr writer, int pe, const xmlChar * name, const char *format, ...);
 
+/*
+ * testlimits.c
+ * changed from `func` to `func_testlimits`
+ */
+static unsigned long callbacks_testlimits = 0;
+void XMLCDECL channel_testlimits(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...);
+void XMLCDECL warningCallback_testlimits(void *ctx ATTRIBUTE_UNUSED, const char *msg ATTRIBUTE_UNUSED, ...);
+void XMLCDECL errorCallback_testlimits(void *ctx ATTRIBUTE_UNUSED, const char *msg ATTRIBUTE_UNUSED, ...);
+void XMLCDECL fatalErrorCallback_testlimits(void *ctx ATTRIBUTE_UNUSED, const char *msg ATTRIBUTE_UNUSED, ...);
 
 #endif

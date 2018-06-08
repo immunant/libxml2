@@ -847,3 +847,82 @@ xmlNanoFTPCloseConnection(void *ctx) {
     }
     return(0);
 }
+
+/*
+ * Trapping the error messages at the generic level to grab the equivalent of
+ * stderr messages on CLI tools.
+ */
+static char testErrors[32769];
+static int testErrorsSize = 0;
+
+void XMLCDECL
+channel_testlimits(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...) {
+    va_list args;
+    int res;
+
+    if (testErrorsSize >= 32768)
+        return;
+    va_start(args, msg);
+    res = vsnprintf(&testErrors[testErrorsSize],
+                    32768 - testErrorsSize,
+		    msg, args);
+    va_end(args);
+    if (testErrorsSize + res >= 32768) {
+        /* buffer is full */
+	testErrorsSize = 32768;
+	testErrors[testErrorsSize] = 0;
+    } else {
+        testErrorsSize += res;
+    }
+    testErrors[testErrorsSize] = 0;
+}
+
+/**
+ * warningCallback:
+ * @ctxt:  An XML parser context
+ * @msg:  the message to display/transmit
+ * @...:  extra parameters for the message display
+ *
+ * Display and format a warning messages, gives file, line, position and
+ * extra parameters.
+ */
+void XMLCDECL
+warningCallback_testlimits(void *ctx ATTRIBUTE_UNUSED,
+                const char *msg ATTRIBUTE_UNUSED, ...)
+{
+    callbacks_testlimits++;
+    return;
+}
+
+/**
+ * errorCallback:
+ * @ctxt:  An XML parser context
+ * @msg:  the message to display/transmit
+ * @...:  extra parameters for the message display
+ *
+ * Display and format a error messages, gives file, line, position and
+ * extra parameters.
+ */
+void XMLCDECL
+errorCallback_testlimits(void *ctx ATTRIBUTE_UNUSED, const char *msg ATTRIBUTE_UNUSED,
+              ...)
+{
+    callbacks_testlimits++;
+    return;
+}
+
+/**
+ * fatalErrorCallback:
+ * @ctxt:  An XML parser context
+ * @msg:  the message to display/transmit
+ * @...:  extra parameters for the message display
+ *
+ * Display and format a fatalError messages, gives file, line, position and
+ * extra parameters.
+ */
+void XMLCDECL
+fatalErrorCallback_testlimits(void *ctx ATTRIBUTE_UNUSED,
+                   const char *msg ATTRIBUTE_UNUSED, ...)
+{
+    return;
+}
