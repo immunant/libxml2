@@ -53,7 +53,7 @@ mod xlink;
 pub mod xmlIO;
 mod xmlcatalog;
 pub mod xmlmemory;
-mod xmlmodule;
+pub mod xmlmodule;
 pub mod xmlreader;
 pub mod xmlregexp;
 pub mod xmlsave;
