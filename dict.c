@@ -107,7 +107,7 @@ struct _xmlDictStrings {
     xmlChar *end;
     size_t size;
     size_t nbStrings;
-    xmlChar array[1];
+    xmlChar array[];
 };
 /*
  * The entire dictionary
