@@ -131,3 +131,4 @@ rust/src/*.rs
 rust/lib/**
 rust/examples/**
 !rust/src/lib.rs
+!rust/.libs
