@@ -961,3 +961,30 @@ xmlNanoFTPCheckResponse(void *ctx) {
 
     return(xmlNanoFTPReadResponse(ctx));
 }
+
+/*
+ * Trapping the error messages at the generic level to grab the equivalent of
+ * stderr messages on CLI tools.
+ */
+
+void XMLCDECL
+channel_testrecurse(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...) {
+    va_list args;
+    int res;
+
+    if (testErrorsSize_recurse >= 32768)
+        return;
+    va_start(args, msg);
+    res = vsnprintf(&testErrors_recurse[testErrorsSize_recurse],
+                    32768 - testErrorsSize_recurse,
+		    msg, args);
+    va_end(args);
+    if (testErrorsSize_recurse + res >= 32768) {
+        /* buffer is full */
+	testErrorsSize_recurse = 32768;
+	testErrors_recurse[testErrorsSize_recurse] = 0;
+    } else {
+        testErrorsSize_recurse += res;
+    }
+    testErrors_recurse[testErrorsSize_recurse] = 0;
+}

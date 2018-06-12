@@ -11,6 +11,7 @@
  */
 
 #include "libxml.h"
+#include "variadic.h"
 #include <stdio.h>
 
 #if !defined(_WIN32) || defined(__CYGWIN__)
@@ -303,34 +304,6 @@ testExternalEntityLoader(const char *URL, const char *ID,
     return(ret);
 }
 
-/*
- * Trapping the error messages at the generic level to grab the equivalent of
- * stderr messages on CLI tools.
- */
-static char testErrors[32769];
-static int testErrorsSize = 0;
-
-static void XMLCDECL
-channel(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...) {
-    va_list args;
-    int res;
-
-    if (testErrorsSize >= 32768)
-        return;
-    va_start(args, msg);
-    res = vsnprintf(&testErrors[testErrorsSize],
-                    32768 - testErrorsSize,
-		    msg, args);
-    va_end(args);
-    if (testErrorsSize + res >= 32768) {
-        /* buffer is full */
-	testErrorsSize = 32768;
-	testErrors[testErrorsSize] = 0;
-    } else {
-        testErrorsSize += res;
-    }
-    testErrors[testErrorsSize] = 0;
-}
 
 /**
  * xmlParserPrintFileContext:
@@ -437,79 +410,79 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
         }
         if (input != NULL) {
             if (input->filename)
-                channel(data, "%s:%d: ", input->filename, input->line);
+                channel_testrecurse(data, "%s:%d: ", input->filename, input->line);
             else if ((line != 0) && (domain == XML_FROM_PARSER))
-                channel(data, "Entity: line %d: ", input->line);
+                channel_testrecurse(data, "Entity: line %d: ", input->line);
         }
     } else {
         if (file != NULL)
-            channel(data, "%s:%d: ", file, line);
+            channel_testrecurse(data, "%s:%d: ", file, line);
         else if ((line != 0) && (domain == XML_FROM_PARSER))
-            channel(data, "Entity: line %d: ", line);
+            channel_testrecurse(data, "Entity: line %d: ", line);
     }
     if (name != NULL) {
-        channel(data, "element %s: ", name);
+        channel_testrecurse(data, "element %s: ", name);
     }
     if (code == XML_ERR_OK)
         return;
     switch (domain) {
         case XML_FROM_PARSER:
-            channel(data, "parser ");
+            channel_testrecurse(data, "parser ");
             break;
         case XML_FROM_NAMESPACE:
-            channel(data, "namespace ");
+            channel_testrecurse(data, "namespace ");
             break;
         case XML_FROM_DTD:
         case XML_FROM_VALID:
-            channel(data, "validity ");
+            channel_testrecurse(data, "validity ");
             break;
         case XML_FROM_HTML:
-            channel(data, "HTML parser ");
+            channel_testrecurse(data, "HTML parser ");
             break;
         case XML_FROM_MEMORY:
-            channel(data, "memory ");
+            channel_testrecurse(data, "memory ");
             break;
         case XML_FROM_OUTPUT:
-            channel(data, "output ");
+            channel_testrecurse(data, "output ");
             break;
         case XML_FROM_IO:
-            channel(data, "I/O ");
+            channel_testrecurse(data, "I/O ");
             break;
         case XML_FROM_XINCLUDE:
-            channel(data, "XInclude ");
+            channel_testrecurse(data, "XInclude ");
             break;
         case XML_FROM_XPATH:
-            channel(data, "XPath ");
+            channel_testrecurse(data, "XPath ");
             break;
         case XML_FROM_XPOINTER:
-            channel(data, "parser ");
+            channel_testrecurse(data, "parser ");
             break;
         case XML_FROM_REGEXP:
-            channel(data, "regexp ");
+            channel_testrecurse(data, "regexp ");
             break;
         case XML_FROM_MODULE:
-            channel(data, "module ");
+            channel_testrecurse(data, "module ");
             break;
         case XML_FROM_SCHEMASV:
-            channel(data, "Schemas validity ");
+            channel_testrecurse(data, "Schemas validity ");
             break;
         case XML_FROM_SCHEMASP:
-            channel(data, "Schemas parser ");
+            channel_testrecurse(data, "Schemas parser ");
             break;
         case XML_FROM_RELAXNGP:
-            channel(data, "Relax-NG parser ");
+            channel_testrecurse(data, "Relax-NG parser ");
             break;
         case XML_FROM_RELAXNGV:
-            channel(data, "Relax-NG validity ");
+            channel_testrecurse(data, "Relax-NG validity ");
             break;
         case XML_FROM_CATALOG:
-            channel(data, "Catalog ");
+            channel_testrecurse(data, "Catalog ");
             break;
         case XML_FROM_C14N:
-            channel(data, "C14N ");
+            channel_testrecurse(data, "C14N ");
             break;
         case XML_FROM_XSLT:
-            channel(data, "XSLT ");
+            channel_testrecurse(data, "XSLT ");
             break;
         default:
             break;
@@ -518,16 +491,16 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
         return;
     switch (level) {
         case XML_ERR_NONE:
-            channel(data, ": ");
+            channel_testrecurse(data, ": ");
             break;
         case XML_ERR_WARNING:
-            channel(data, "warning : ");
+            channel_testrecurse(data, "warning : ");
             break;
         case XML_ERR_ERROR:
-            channel(data, "error : ");
+            channel_testrecurse(data, "error : ");
             break;
         case XML_ERR_FATAL:
-            channel(data, "error : ");
+            channel_testrecurse(data, "error : ");
             break;
     }
     if (code == XML_ERR_OK)
@@ -536,23 +509,23 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
         int len;
 	len = xmlStrlen((const xmlChar *)str);
 	if ((len > 0) && (str[len - 1] != '\n'))
-	    channel(data, "%s\n", str);
+	    channel_testrecurse(data, "%s\n", str);
 	else
-	    channel(data, "%s", str);
+	    channel_testrecurse(data, "%s", str);
     } else {
-        channel(data, "%s\n", "out of memory error");
+        channel_testrecurse(data, "%s\n", "out of memory error");
     }
     if (code == XML_ERR_OK)
         return;
 
     if (ctxt != NULL) {
-        xmlParserPrintFileContextInternal(input, channel, data);
+        xmlParserPrintFileContextInternal(input, channel_testrecurse, data);
         if (cur != NULL) {
             if (cur->filename)
-                channel(data, "%s:%d: \n", cur->filename, cur->line);
+                channel_testrecurse(data, "%s:%d: \n", cur->filename, cur->line);
             else if ((line != 0) && (domain == XML_FROM_PARSER))
-                channel(data, "Entity: line %d: \n", cur->line);
-            xmlParserPrintFileContextInternal(cur, channel, data);
+                channel_testrecurse(data, "Entity: line %d: \n", cur->line);
+            xmlParserPrintFileContextInternal(cur, channel_testrecurse, data);
         }
     }
     if ((domain == XML_FROM_XPATH) && (err->str1 != NULL) &&
@@ -561,12 +534,12 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
 	xmlChar buf[150];
 	int i;
 
-	channel(data, "%s\n", err->str1);
+	channel_testrecurse(data, "%s\n", err->str1);
 	for (i=0;i < err->int1;i++)
 	     buf[i] = ' ';
 	buf[i++] = '^';
 	buf[i] = 0;
-	channel(data, "%s\n", buf);
+	channel_testrecurse(data, "%s\n", buf);
     }
 }
 
@@ -854,8 +827,8 @@ launchTests(testDescPtr tst) {
 	    } else {
 		mem = xmlMemUsed();
 		extraMemoryFromResolver = 0;
-		testErrorsSize = 0;
-		testErrors[0] = 0;
+		testErrorsSize_recurse = 0;
+		testErrors_recurse[0] = 0;
 		res = tst->func(globbuf.gl_pathv[i], result, error,
 		                tst->options | XML_PARSE_COMPACT);
 		xmlResetLastError();
@@ -874,7 +847,7 @@ launchTests(testDescPtr tst) {
 			err++;
 		    }
 		}
-		testErrorsSize = 0;
+		testErrorsSize_recurse = 0;
 	    }
 	    if (result)
 		free(result);
@@ -883,8 +856,8 @@ launchTests(testDescPtr tst) {
 	}
 	globfree(&globbuf);
     } else {
-        testErrorsSize = 0;
-	testErrors[0] = 0;
+        testErrorsSize_recurse = 0;
+	testErrors_recurse[0] = 0;
 	extraMemoryFromResolver = 0;
         res = tst->func(NULL, NULL, NULL, tst->options);
 	if (res != 0) {

@@ -244,4 +244,11 @@ void XMLCDECL fatalErrorCallback_testlimits(void *ctx ATTRIBUTE_UNUSED, const ch
 extern int xmlNanoFTPReadResponse(void *ctx);
 int xmlNanoFTPCheckResponse(void *ctx);
 
+/*
+ * testapi.c
+ * moved the `channel` function as well as some variables, and renamed them.
+ */
+static char testErrors_recurse[32769];
+static int testErrorsSize_recurse = 0;
+void XMLCDECL channel_testrecurse(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...);
 #endif
