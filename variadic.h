@@ -237,4 +237,11 @@ void XMLCDECL warningCallback_testlimits(void *ctx ATTRIBUTE_UNUSED, const char 
 void XMLCDECL errorCallback_testlimits(void *ctx ATTRIBUTE_UNUSED, const char *msg ATTRIBUTE_UNUSED, ...);
 void XMLCDECL fatalErrorCallback_testlimits(void *ctx ATTRIBUTE_UNUSED, const char *msg ATTRIBUTE_UNUSED, ...);
 
+/*
+ * nanoftp.c
+ * xmlNanoFTPCheckResponse uses asm, so linking against it is possibly the best choice
+ */
+extern int xmlNanoFTPReadResponse(void *ctx);
+int xmlNanoFTPCheckResponse(void *ctx);
+
 #endif

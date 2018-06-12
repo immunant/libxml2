@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif
+
 // #include "libxml2.h"
 #include "variadic.h"
 
@@ -925,4 +929,35 @@ fatalErrorCallback_testlimits(void *ctx ATTRIBUTE_UNUSED,
                    const char *msg ATTRIBUTE_UNUSED, ...)
 {
     return;
+}
+
+/**
+ * xmlNanoFTPCheckResponse:
+ * @ctx:  an FTP context
+ *
+ * Check if there is a response from the FTP server after a command.
+ * Returns the code number, or 0
+ */
+
+int
+xmlNanoFTPCheckResponse(void *ctx) {
+    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
+    fd_set rfd;
+    struct timeval tv;
+
+    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return(-1);
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    FD_ZERO(&rfd);
+    FD_SET(ctxt->controlFd, &rfd);
+    switch(select(ctxt->controlFd + 1, &rfd, NULL, NULL, &tv)) {
+	case 0:
+	    return(0);
+	case -1:
+	    __xmlIOErr(XML_FROM_FTP, 0, "select");
+	    return(-1);
+
+    }
+
+    return(xmlNanoFTPReadResponse(ctx));
 }

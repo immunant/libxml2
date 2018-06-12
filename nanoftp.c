@@ -632,7 +632,7 @@ xmlNanoFTPGetMore(void *ctx) {
  * Read the response from the FTP server after a command.
  * Returns the code number
  */
-static int
+int
 xmlNanoFTPReadResponse(void *ctx) {
     xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
     char *ptr, *end;
@@ -712,37 +712,6 @@ xmlNanoFTPGetResponse(void *ctx) {
     res = xmlNanoFTPReadResponse(ctx);
 
     return(res);
-}
-
-/**
- * xmlNanoFTPCheckResponse:
- * @ctx:  an FTP context
- *
- * Check if there is a response from the FTP server after a command.
- * Returns the code number, or 0
- */
-
-int
-xmlNanoFTPCheckResponse(void *ctx) {
-    xmlNanoFTPCtxtPtr ctxt = (xmlNanoFTPCtxtPtr) ctx;
-    fd_set rfd;
-    struct timeval tv;
-
-    if ((ctxt == NULL) || (ctxt->controlFd == INVALID_SOCKET)) return(-1);
-    tv.tv_sec = 0;
-    tv.tv_usec = 0;
-    FD_ZERO(&rfd);
-    FD_SET(ctxt->controlFd, &rfd);
-    switch(select(ctxt->controlFd + 1, &rfd, NULL, NULL, &tv)) {
-	case 0:
-	    return(0);
-	case -1:
-	    __xmlIOErr(XML_FROM_FTP, 0, "select");
-	    return(-1);
-
-    }
-
-    return(xmlNanoFTPReadResponse(ctx));
 }
 
 /**
