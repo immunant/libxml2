@@ -54,6 +54,9 @@ struct testDesc {
     int     options;  /* parser options for the test */
 };
 
+extern char testErrors_recurse[32769];
+extern int testErrorsSize_recurse;
+
 static int checkTestFile(const char *filename);
 
 

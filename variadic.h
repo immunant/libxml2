@@ -148,6 +148,7 @@ typedef struct xmlNanoFTPCtxt {
 } xmlNanoFTPCtxt, *xmlNanoFTPCtxtPtr;
 
 // from error.c:
+void xmlReportError(xmlErrorPtr err, xmlParserCtxtPtr ctxt, const char *str, xmlGenericErrorFunc channel, void *data);
 #define XML_GET_VAR_STR(msg, str) {				\
     int       size, prev_size = -1;				\
     int       chars;						\
@@ -232,7 +233,6 @@ void XMLCDECL fatalErrorSplit(void *ctx, const char *msg ATTRIBUTE_UNUSED, ...);
  * testlimits.c
  * changed from `func` to `func_testlimits`
  */
-static unsigned long callbacks_testlimits = 0;
 void XMLCDECL channel_testlimits(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...);
 void XMLCDECL warningCallback_testlimits(void *ctx ATTRIBUTE_UNUSED, const char *msg ATTRIBUTE_UNUSED, ...);
 void XMLCDECL errorCallback_testlimits(void *ctx ATTRIBUTE_UNUSED, const char *msg ATTRIBUTE_UNUSED, ...);
@@ -243,14 +243,13 @@ void XMLCDECL fatalErrorCallback_testlimits(void *ctx ATTRIBUTE_UNUSED, const ch
  * xmlNanoFTPCheckResponse uses asm, so linking against it is possibly the best choice
  */
 extern int xmlNanoFTPReadResponse(void *ctx);
-int xmlNanoFTPCheckResponse(void *ctx);
+// Already included in another header afaict:
+// int xmlNanoFTPCheckResponse(void *ctx);
 
 /*
  * testapi.c
  * moved the `channel` function as well as some variables, and renamed them.
  */
-static char testErrors_recurse[32769];
-static int testErrorsSize_recurse = 0;
 void XMLCDECL channel_testrecurse(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...);
 #endif
 

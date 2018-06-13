@@ -15,9 +15,6 @@
 #include "variadic.h"
 
 // from error.c:
-void xmlReportError(xmlErrorPtr err, xmlParserCtxtPtr ctxt, const char *str, xmlGenericErrorFunc channel, void *data);
-
-// from error.c:
 void XMLCDECL
 xmlGenericErrorDefaultFunc(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...) {
     va_list args;
@@ -854,6 +851,7 @@ xmlNanoFTPCloseConnection(void *ctx) {
  */
 static char testErrors[32769];
 static int testErrorsSize = 0;
+unsigned long callbacks_testlimits = 0;
 
 void XMLCDECL
 channel_testlimits(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...) {
@@ -958,6 +956,9 @@ xmlNanoFTPCheckResponse(void *ctx) {
     return(xmlNanoFTPReadResponse(ctx));
 }
 
+// from testrecurse.c:
+char testErrors_recurse[32769];
+int testErrorsSize_recurse = 0;
 /*
  * Trapping the error messages at the generic level to grab the equivalent of
  * stderr messages on CLI tools.
@@ -1018,8 +1019,8 @@ testHTML_fatalErrorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
 }
 
 // from testSAX.c:
-extern int testSAX_callbacks;
-extern int testSAX_quiet;
+int testSAX_callbacks = 0;
+int testSAX_quiet = 0;
 void XMLCDECL
 testSAX_warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
 {

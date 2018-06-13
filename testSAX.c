@@ -56,11 +56,11 @@ static int recovery = 0;
 static int push = 0;
 static int speed = 0;
 static int noent = 0;
-int testSAX_quiet = 0;
+extern int testSAX_quiet;
 static int nonull = 0;
 static int sax2 = 0;
 static int repeat = 0;
-int testSAX_callbacks = 0;
+extern int testSAX_callbacks;
 static int timing = 0;
 
 /*

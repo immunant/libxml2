@@ -34,6 +34,7 @@
 
 static int verbose = 0;
 static int tests_quiet = 0;
+extern unsigned long callbacks_testlimits;
 
 /************************************************************************
  *									*
