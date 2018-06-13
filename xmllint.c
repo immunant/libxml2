@@ -8,7 +8,6 @@
 
 #include "libxml.h"
 #include "variadic.h"
-#include "xmllint_variadic.h"
 
 #include <string.h>
 #include <stdarg.h>
@@ -118,7 +117,7 @@ static int recovery = 0;
 static int noent = 0;
 static int noenc = 0;
 static int noblanks = 0;
-int xmllint_noout = 0;
+extern int xmllint_noout;
 static int nowrap = 0;
 #ifdef LIBXML_OUTPUT_ENABLED
 static int format = 0;
@@ -166,7 +165,7 @@ static int xinclude = 0;
 #endif
 static int dtdattrs = 0;
 static int loaddtd = 0;
-xmllintReturnCode progresult = XMLLINT_RETURN_OK;
+extern xmllintReturnCode xmllint_progresult;
 static int timing = 0;
 static int generate = 0;
 static int dropdtd = 0;
@@ -333,7 +332,7 @@ static void
 OOM(void)
 {
     fprintf(stderr, "Ran out of memory needs > %d bytes\n", maxmem);
-    progresult = XMLLINT_ERR_MEM;
+    xmllint_progresult = XMLLINT_ERR_MEM;
 }
 
 static void
@@ -419,35 +418,35 @@ my_gettimeofday(struct timeval *tvp, void *tzp)
 #endif /* !HAVE_GETTIMEOFDAY */
 
 #if defined(HAVE_GETTIMEOFDAY)
-static struct timeval begin, end;
+extern struct timeval xmllint_begin, xmllint_end;
 
 /*
- * startTimer: call where you want to start timing
+ * xmllint_startTimer: call where you want to start timing
  */
 static void
-startTimer(void)
+xmllint_startTimer(void)
 {
-    gettimeofday(&begin, NULL);
+    gettimeofday(&xmllint_begin, NULL);
 }
 
 /*
- * endTimer: call where you want to stop timing and to print out a
+ * xmllint_endTimer: call where you want to stop timing and to print out a
  *           message about the timing performed; format is a printf
  *           type argument
  */
 // static void XMLCDECL LIBXML_ATTR_FORMAT(1,2)
-// endTimer(const char *fmt, ...)
+// xmllint_endTimer(const char *fmt, ...)
 // {
 //     long msec;
 //     va_list ap;
 
-//     gettimeofday(&end, NULL);
-//     msec = end.tv_sec - begin.tv_sec;
+//     gettimeofday(&xmllint_end, NULL);
+//     msec = xmllint_end.tv_sec - xmllint_begin.tv_sec;
 //     msec *= 1000;
-//     msec += (end.tv_usec - begin.tv_usec) / 1000;
+//     msec += (xmllint_end.tv_usec - xmllint_begin.tv_usec) / 1000;
 
 // #ifndef HAVE_STDARG_H
-// #error "endTimer required stdarg functions"
+// #error "xmllint_endTimer required stdarg functions"
 // #endif
 //     va_start(ap, fmt);
 //     vfprintf(stderr, fmt, ap);
@@ -465,23 +464,23 @@ startTimer(void)
 #define CLOCKS_PER_SEC 100
 #endif
 
-static clock_t begin, end;
+static clock_t xmllint_begin, xmllint_end;
 static void
-startTimer(void)
+xmllint_startTimer(void)
 {
-    begin = clock();
+    xmllint_begin = clock();
 }
 // static void XMLCDECL LIBXML_ATTR_FORMAT(1,2)
-// endTimer(const char *fmt, ...)
+// xmllint_endTimer(const char *fmt, ...)
 // {
 //     long msec;
 //     va_list ap;
 
-//     end = clock();
-//     msec = ((end - begin) * 1000) / CLOCKS_PER_SEC;
+//     xmllint_end = clock();
+//     msec = ((xmllint_end - xmllint_begin) * 1000) / CLOCKS_PER_SEC;
 
 // #ifndef HAVE_STDARG_H
-// #error "endTimer required stdarg functions"
+// #error "xmllint_endTimer required stdarg functions"
 // #endif
 //     va_start(ap, fmt);
 //     vfprintf(stderr, fmt, ap);
@@ -494,14 +493,14 @@ startTimer(void)
  * We don't have a gettimeofday or time.h, so we just don't do timing
  */
 static void
-startTimer(void)
+xmllint_startTimer(void)
 {
     /*
      * Do nothing
      */
 }
 // static void XMLCDECL LIBXML_ATTR_FORMAT(1,2)
-// endTimer(char *format, ...)
+// xmllint_endTimer(char *format, ...)
 // {
 //     /*
 //      * We cannot do anything because we don't have a timing function
@@ -524,19 +523,19 @@ startTimer(void)
  *			HTML ouput					*
  *									*
  ************************************************************************/
-char xmllint_buffer[50000];
+extern char xmllint_buffer[50000];
 
-void
-xmlHTMLEncodeSend(void) {
-    char *result;
+// void
+// xmlHTMLEncodeSend(void) {
+//     char *result;
 
-    result = (char *) xmlEncodeEntitiesReentrant(NULL, BAD_CAST xmllint_buffer);
-    if (result) {
-	xmlGenericError(xmlGenericErrorContext, "%s", result);
-	xmlFree(result);
-    }
-    xmllint_buffer[0] = 0;
-}
+//     result = (char *) xmlEncodeEntitiesReentrant(NULL, BAD_CAST xmllint_buffer);
+//     if (result) {
+// 	xmlGenericError(xmlGenericErrorContext, "%s", result);
+// 	xmlFree(result);
+//     }
+//     xmllint_buffer[0] = 0;
+// }
 
 /**
  * xmlHTMLPrintFileInfo:
@@ -545,22 +544,22 @@ xmlHTMLEncodeSend(void) {
  * Displays the associated file and line informations for the current input
  */
 
-void
-xmlHTMLPrintFileInfo(xmlParserInputPtr input) {
-    int len;
-    xmlGenericError(xmlGenericErrorContext, "<p>");
+// void
+// xmlHTMLPrintFileInfo(xmlParserInputPtr input) {
+//     int len;
+//     xmlGenericError(xmlGenericErrorContext, "<p>");
 
-    len = strlen(xmllint_buffer);
-    if (input != NULL) {
-	if (input->filename) {
-	    snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "%s:%d: ", input->filename,
-		    input->line);
-	} else {
-	    snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "Entity: line %d: ", input->line);
-	}
-    }
-    xmlHTMLEncodeSend();
-}
+//     len = strlen(xmllint_buffer);
+//     if (input != NULL) {
+// 	if (input->filename) {
+// 	    snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "%s:%d: ", input->filename,
+// 		    input->line);
+// 	} else {
+// 	    snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "Entity: line %d: ", input->line);
+// 	}
+//     }
+//     xmlHTMLEncodeSend();
+// }
 
 /**
  * xmlHTMLPrintFileContext:
@@ -569,47 +568,47 @@ xmlHTMLPrintFileInfo(xmlParserInputPtr input) {
  * Displays current context within the input content for error tracking
  */
 
-void
-xmlHTMLPrintFileContext(xmlParserInputPtr input) {
-    const xmlChar *cur, *base;
-    int len;
-    int n;
+// void
+// xmlHTMLPrintFileContext(xmlParserInputPtr input) {
+//     const xmlChar *cur, *base;
+//     int len;
+//     int n;
 
-    if (input == NULL) return;
-    xmlGenericError(xmlGenericErrorContext, "<pre>\n");
-    cur = input->cur;
-    base = input->base;
-    while ((cur > base) && ((*cur == '\n') || (*cur == '\r'))) {
-	cur--;
-    }
-    n = 0;
-    while ((n++ < 80) && (cur > base) && (*cur != '\n') && (*cur != '\r'))
-        cur--;
-    if ((*cur == '\n') || (*cur == '\r')) cur++;
-    base = cur;
-    n = 0;
-    while ((*cur != 0) && (*cur != '\n') && (*cur != '\r') && (n < 79)) {
-	len = strlen(xmllint_buffer);
-        snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "%c",
-		    (unsigned char) *cur++);
-	n++;
-    }
-    len = strlen(xmllint_buffer);
-    snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "\n");
-    cur = input->cur;
-    while ((*cur == '\n') || (*cur == '\r'))
-	cur--;
-    n = 0;
-    while ((cur != base) && (n++ < 80)) {
-	len = strlen(xmllint_buffer);
-        snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, " ");
-        base++;
-    }
-    len = strlen(xmllint_buffer);
-    snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "^\n");
-    xmlHTMLEncodeSend();
-    xmlGenericError(xmlGenericErrorContext, "</pre>");
-}
+//     if (input == NULL) return;
+//     xmlGenericError(xmlGenericErrorContext, "<pre>\n");
+//     cur = input->cur;
+//     base = input->base;
+//     while ((cur > base) && ((*cur == '\n') || (*cur == '\r'))) {
+// 	cur--;
+//     }
+//     n = 0;
+//     while ((n++ < 80) && (cur > base) && (*cur != '\n') && (*cur != '\r'))
+//         cur--;
+//     if ((*cur == '\n') || (*cur == '\r')) cur++;
+//     base = cur;
+//     n = 0;
+//     while ((*cur != 0) && (*cur != '\n') && (*cur != '\r') && (n < 79)) {
+// 	len = strlen(xmllint_buffer);
+//         snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "%c",
+// 		    (unsigned char) *cur++);
+// 	n++;
+//     }
+//     len = strlen(xmllint_buffer);
+//     snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "\n");
+//     cur = input->cur;
+//     while ((*cur == '\n') || (*cur == '\r'))
+// 	cur--;
+//     n = 0;
+//     while ((cur != base) && (n++ < 80)) {
+// 	len = strlen(xmllint_buffer);
+//         snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, " ");
+//         base++;
+//     }
+//     len = strlen(xmllint_buffer);
+//     snprintf(&xmllint_buffer[len], sizeof(xmllint_buffer) - len, "^\n");
+//     xmlHTMLEncodeSend();
+//     xmlGenericError(xmlGenericErrorContext, "</pre>");
+// }
 
 /**
  * xmlHTMLError:
@@ -720,7 +719,7 @@ xmlHTMLPrintFileContext(xmlParserInputPtr input) {
 
 //     xmlHTMLPrintFileContext(input);
 //     xmlHTMLEncodeSend();
-//     progresult = XMLLINT_ERR_VALID;
+//     xmllint_progresult = XMLLINT_ERR_VALID;
 // }
 
 /**
@@ -872,7 +871,7 @@ static xmlSAXHandler emptySAXHandlerStruct = {
 
 static xmlSAXHandlerPtr emptySAXHandler = &emptySAXHandlerStruct;
 extern xmlSAXHandlerPtr debugSAXHandler;
-int xmllint_callbacks;
+extern int xmllint_callbacks;
 
 /**
  * isStandaloneDebug:
@@ -1480,9 +1479,9 @@ static xmlSAXHandler debugSAXHandlerStruct = {
     ignorableWhitespaceDebug,
     processingInstructionDebug,
     commentDebug,
-    warningDebug,
-    errorDebug,
-    fatalErrorDebug,
+    xmllint_warningDebug,
+    xmllint_errorDebug,
+    xmllint_fatalErrorDebug,
     getParameterEntityDebug,
     cdataBlockDebug,
     externalSubsetDebug,
@@ -1604,9 +1603,9 @@ static xmlSAXHandler debugSAX2HandlerStruct = {
     ignorableWhitespaceDebug,
     processingInstructionDebug,
     commentDebug,
-    warningDebug,
-    errorDebug,
-    fatalErrorDebug,
+    xmllint_warningDebug,
+    xmllint_errorDebug,
+    xmllint_fatalErrorDebug,
     getParameterEntityDebug,
     cdataBlockDebug,
     externalSubsetDebug,
@@ -1667,11 +1666,11 @@ testSAX(const char *filename) {
 		fprintf(stderr, "%s validates\n", filename);
 	    } else if (ret > 0) {
 		fprintf(stderr, "%s fails to validate\n", filename);
-		progresult = XMLLINT_ERR_VALID;
+		xmllint_progresult = XMLLINT_ERR_VALID;
 	    } else {
 		fprintf(stderr, "%s validation generated an internal error\n",
 		       filename);
-		progresult = XMLLINT_ERR_VALID;
+		xmllint_progresult = XMLLINT_ERR_VALID;
 	    }
 	}
 	xmlSchemaFreeValidCtxt(vctxt);
@@ -1828,7 +1827,7 @@ static void streamFile(char *filename) {
 	if (base == (void *) MAP_FAILED) {
 	    close(fd);
 	    fprintf(stderr, "mmap failure for file %s\n", filename);
-	    progresult = XMLLINT_ERR_RDFILE;
+	    xmllint_progresult = XMLLINT_ERR_RDFILE;
 	    return;
 	}
 
@@ -1843,7 +1842,7 @@ static void streamFile(char *filename) {
 	if (patternc == NULL) {
 	    xmlGenericError(xmlGenericErrorContext,
 		    "Pattern %s failed to compile\n", pattern);
-            progresult = XMLLINT_ERR_SCHEMAPAT;
+            xmllint_progresult = XMLLINT_ERR_SCHEMAPAT;
 	    pattern = NULL;
 	}
     }
@@ -1872,32 +1871,32 @@ static void streamFile(char *filename) {
 #ifdef LIBXML_SCHEMAS_ENABLED
 	if (relaxng != NULL) {
 	    if ((timing) && (!repeat)) {
-		startTimer();
+		xmllint_startTimer();
 	    }
 	    ret = xmlTextReaderRelaxNGValidate(reader, relaxng);
 	    if (ret < 0) {
 		xmlGenericError(xmlGenericErrorContext,
 			"Relax-NG schema %s failed to compile\n", relaxng);
-		progresult = XMLLINT_ERR_SCHEMACOMP;
+		xmllint_progresult = XMLLINT_ERR_SCHEMACOMP;
 		relaxng = NULL;
 	    }
 	    if ((timing) && (!repeat)) {
-		endTimer("Compiling the schemas");
+		xmllint_endTimer("Compiling the schemas");
 	    }
 	}
 	if (schema != NULL) {
 	    if ((timing) && (!repeat)) {
-		startTimer();
+		xmllint_startTimer();
 	    }
 	    ret = xmlTextReaderSchemaValidate(reader, schema);
 	    if (ret < 0) {
 		xmlGenericError(xmlGenericErrorContext,
 			"XSD schema %s failed to compile\n", schema);
-		progresult = XMLLINT_ERR_SCHEMACOMP;
+		xmllint_progresult = XMLLINT_ERR_SCHEMACOMP;
 		schema = NULL;
 	    }
 	    if ((timing) && (!repeat)) {
-		endTimer("Compiling the schemas");
+		xmllint_endTimer("Compiling the schemas");
 	    }
 	}
 #endif
@@ -1906,7 +1905,7 @@ static void streamFile(char *filename) {
 	 * Process all nodes in sequence
 	 */
 	if ((timing) && (!repeat)) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 	ret = xmlTextReaderRead(reader);
 	while (ret == 1) {
@@ -1921,15 +1920,15 @@ static void streamFile(char *filename) {
 	if ((timing) && (!repeat)) {
 #ifdef LIBXML_SCHEMAS_ENABLED
 	    if (relaxng != NULL)
-		endTimer("Parsing and validating");
+		xmllint_endTimer("Parsing and validating");
 	    else
 #endif
 #ifdef LIBXML_VALID_ENABLED
 	    if (valid)
-		endTimer("Parsing and validating");
+		xmllint_endTimer("Parsing and validating");
 	    else
 #endif
-	    endTimer("Parsing");
+	    xmllint_endTimer("Parsing");
 	}
 
 #ifdef LIBXML_VALID_ENABLED
@@ -1937,7 +1936,7 @@ static void streamFile(char *filename) {
 	    if (xmlTextReaderIsValid(reader) != 1) {
 		xmlGenericError(xmlGenericErrorContext,
 			"Document %s does not validate\n", filename);
-		progresult = XMLLINT_ERR_VALID;
+		xmllint_progresult = XMLLINT_ERR_VALID;
 	    }
 	}
 #endif /* LIBXML_VALID_ENABLED */
@@ -1945,7 +1944,7 @@ static void streamFile(char *filename) {
 	if ((relaxng != NULL) || (schema != NULL)) {
 	    if (xmlTextReaderIsValid(reader) != 1) {
 		fprintf(stderr, "%s fails to validate\n", filename);
-		progresult = XMLLINT_ERR_VALID;
+		xmllint_progresult = XMLLINT_ERR_VALID;
 	    } else {
 		fprintf(stderr, "%s validates\n", filename);
 	    }
@@ -1957,11 +1956,11 @@ static void streamFile(char *filename) {
 	xmlFreeTextReader(reader);
 	if (ret != 0) {
 	    fprintf(stderr, "%s : failed to parse\n", filename);
-	    progresult = XMLLINT_ERR_UNCLASS;
+	    xmllint_progresult = XMLLINT_ERR_UNCLASS;
 	}
     } else {
 	fprintf(stderr, "Unable to open %s\n", filename);
-	progresult = XMLLINT_ERR_UNCLASS;
+	xmllint_progresult = XMLLINT_ERR_UNCLASS;
     }
 #ifdef LIBXML_PATTERN_ENABLED
     if (patstream != NULL) {
@@ -1992,7 +1991,7 @@ static void walkDoc(xmlDocPtr doc) {
     if (root == NULL ) {
         xmlGenericError(xmlGenericErrorContext,
                 "Document does not have a root element");
-        progresult = XMLLINT_ERR_UNCLASS;
+        xmllint_progresult = XMLLINT_ERR_UNCLASS;
         return;
     }
     for (ns = root->nsDef, i = 0;ns != NULL && i < 20;ns=ns->next) {
@@ -2008,7 +2007,7 @@ static void walkDoc(xmlDocPtr doc) {
 	if (patternc == NULL) {
 	    xmlGenericError(xmlGenericErrorContext,
 		    "Pattern %s failed to compile\n", pattern);
-            progresult = XMLLINT_ERR_SCHEMAPAT;
+            xmllint_progresult = XMLLINT_ERR_SCHEMAPAT;
 	    pattern = NULL;
 	}
     }
@@ -2027,7 +2026,7 @@ static void walkDoc(xmlDocPtr doc) {
     reader = xmlReaderWalker(doc);
     if (reader != NULL) {
 	if ((timing) && (!repeat)) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 	ret = xmlTextReaderRead(reader);
 	while (ret == 1) {
@@ -2040,16 +2039,16 @@ static void walkDoc(xmlDocPtr doc) {
 	    ret = xmlTextReaderRead(reader);
 	}
 	if ((timing) && (!repeat)) {
-	    endTimer("walking through the doc");
+	    xmllint_endTimer("walking through the doc");
 	}
 	xmlFreeTextReader(reader);
 	if (ret != 0) {
 	    fprintf(stderr, "failed to walk through the doc\n");
-	    progresult = XMLLINT_ERR_UNCLASS;
+	    xmllint_progresult = XMLLINT_ERR_UNCLASS;
 	}
     } else {
 	fprintf(stderr, "Failed to crate a reader from the document\n");
-	progresult = XMLLINT_ERR_UNCLASS;
+	xmllint_progresult = XMLLINT_ERR_UNCLASS;
     }
 #ifdef LIBXML_PATTERN_ENABLED
     if (patstream != NULL) {
@@ -2077,13 +2076,13 @@ static void doXPathDump(xmlXPathObjectPtr cur) {
 
             if ((cur->nodesetval == NULL) || (cur->nodesetval->nodeNr <= 0)) {
                 fprintf(stderr, "XPath set is empty\n");
-                progresult = XMLLINT_ERR_XPATH;
+                xmllint_progresult = XMLLINT_ERR_XPATH;
                 break;
             }
             ctxt = xmlSaveToFd(1, NULL, 0);
             if (ctxt == NULL) {
                 fprintf(stderr, "Out of memory for XPath\n");
-                progresult = XMLLINT_ERR_MEM;
+                xmllint_progresult = XMLLINT_ERR_MEM;
                 return;
             }
             for (i = 0;i < cur->nodesetval->nodeNr;i++) {
@@ -2121,11 +2120,11 @@ static void doXPathDump(xmlXPathObjectPtr cur) {
 	    break;
         case XPATH_UNDEFINED:
 	    fprintf(stderr, "XPath Object is uninitialized\n");
-            progresult = XMLLINT_ERR_XPATH;
+            xmllint_progresult = XMLLINT_ERR_XPATH;
 	    break;
 	default:
 	    fprintf(stderr, "XPath object of unexpected type\n");
-            progresult = XMLLINT_ERR_XPATH;
+            xmllint_progresult = XMLLINT_ERR_XPATH;
 	    break;
     }
 }
@@ -2137,7 +2136,7 @@ static void doXPathQuery(xmlDocPtr doc, const char *query) {
     ctxt = xmlXPathNewContext(doc);
     if (ctxt == NULL) {
         fprintf(stderr, "Out of memory for XPath\n");
-        progresult = XMLLINT_ERR_MEM;
+        xmllint_progresult = XMLLINT_ERR_MEM;
         return;
     }
     ctxt->node = (xmlNodePtr) doc;
@@ -2146,7 +2145,7 @@ static void doXPathQuery(xmlDocPtr doc, const char *query) {
 
     if (res == NULL) {
         fprintf(stderr, "XPath evaluation failure\n");
-        progresult = XMLLINT_ERR_XPATH;
+        xmllint_progresult = XMLLINT_ERR_XPATH;
         return;
     }
     doXPathDump(res);
@@ -2166,7 +2165,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 #endif /* LIBXML_TREE_ENABLED */
 
     if ((timing) && (!repeat))
-	startTimer();
+	xmllint_startTimer();
 
 
 #ifdef LIBXML_TREE_ENABLED
@@ -2227,7 +2226,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	if (base == (void *) MAP_FAILED) {
 	    close(fd);
 	    fprintf(stderr, "mmap failure for file %s\n", filename);
-	    progresult = XMLLINT_ERR_RDFILE;
+	    xmllint_progresult = XMLLINT_ERR_RDFILE;
 	    return;
 	}
 
@@ -2347,7 +2346,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	    if (base == (void *) MAP_FAILED) {
 	        close(fd);
 	        fprintf(stderr, "mmap failure for file %s\n", filename);
-		progresult = XMLLINT_ERR_RDFILE;
+		xmllint_progresult = XMLLINT_ERR_RDFILE;
 	        return;
 	    }
 
@@ -2375,7 +2374,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 		doc = xmlCtxtReadFile(ctxt, filename, NULL, options);
 
 		if (ctxt->valid == 0)
-		    progresult = XMLLINT_ERR_RDFILE;
+		    xmllint_progresult = XMLLINT_ERR_RDFILE;
 		if (rectxt == NULL)
 		    xmlFreeParserCtxt(ctxt);
 	    }
@@ -2398,12 +2397,12 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
      * If we don't have a document we might as well give up.  Do we
      * want an error message here?  <sven@zen.org> */
     if (doc == NULL) {
-	progresult = XMLLINT_ERR_UNCLASS;
+	xmllint_progresult = XMLLINT_ERR_UNCLASS;
 	return;
     }
 
     if ((timing) && (!repeat)) {
-	endTimer("Parsing");
+	xmllint_endTimer("Parsing");
     }
 
     /*
@@ -2422,12 +2421,12 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 #ifdef LIBXML_XINCLUDE_ENABLED
     if (xinclude) {
 	if ((timing) && (!repeat)) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 	if (xmlXIncludeProcessFlags(doc, options) < 0)
-	    progresult = XMLLINT_ERR_UNCLASS;
+	    xmllint_progresult = XMLLINT_ERR_UNCLASS;
 	if ((timing) && (!repeat)) {
-	    endTimer("Xinclude processing");
+	    xmllint_endTimer("Xinclude processing");
 	}
     }
 #endif
@@ -2457,18 +2456,18 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
     if (copy) {
         tmp = doc;
 	if (timing) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 	doc = xmlCopyDoc(doc, 1);
 	if (timing) {
-	    endTimer("Copying");
+	    xmllint_endTimer("Copying");
 	}
 	if (timing) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 	xmlFreeDoc(tmp);
 	if (timing) {
-	    endTimer("Freeing original");
+	    xmllint_endTimer("Freeing original");
 	}
     }
 #endif /* LIBXML_TREE_ENABLED */
@@ -2515,7 +2514,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	if (!debug) {
 #endif
 	    if ((timing) && (!repeat)) {
-		startTimer();
+		xmllint_startTimer();
 	    }
 #ifdef LIBXML_HTML_ENABLED
             if ((html) && (!xmlout)) {
@@ -2542,17 +2541,17 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 		    }
 		    if (out != NULL) {
 			if (htmlDocDump(out, doc) < 0)
-			    progresult = XMLLINT_ERR_OUT;
+			    xmllint_progresult = XMLLINT_ERR_OUT;
 
 			if (output != NULL)
 			    fclose(out);
 		    } else {
 			fprintf(stderr, "failed to open %s\n", output);
-			progresult = XMLLINT_ERR_OUT;
+			xmllint_progresult = XMLLINT_ERR_OUT;
 		    }
 		}
 		if ((timing) && (!repeat)) {
-		    endTimer("Saving");
+		    xmllint_endTimer("Saving");
 		}
 	    } else
 #endif
@@ -2569,7 +2568,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 		    xmlFree(result);
 		} else {
 		    fprintf(stderr, "Failed to canonicalize\n");
-		    progresult = XMLLINT_ERR_OUT;
+		    xmllint_progresult = XMLLINT_ERR_OUT;
 		}
 	    } else if (canonical_11) {
 	        xmlChar *result = NULL;
@@ -2583,7 +2582,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 		    xmlFree(result);
 		} else {
 		    fprintf(stderr, "Failed to canonicalize\n");
-		    progresult = XMLLINT_ERR_OUT;
+		    xmllint_progresult = XMLLINT_ERR_OUT;
 		}
 	    } else
             if (exc_canonical) {
@@ -2598,7 +2597,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 		    xmlFree(result);
 		} else {
 		    fprintf(stderr, "Failed to canonicalize\n");
-		    progresult = XMLLINT_ERR_OUT;
+		    xmllint_progresult = XMLLINT_ERR_OUT;
 		}
 	    } else
 #endif
@@ -2621,7 +2620,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 		}
 		if (result == NULL) {
 		    fprintf(stderr, "Failed to save\n");
-		    progresult = XMLLINT_ERR_OUT;
+		    xmllint_progresult = XMLLINT_ERR_OUT;
 		} else {
 		    if (write(1, result, len) == -1) {
 		        fprintf(stderr, "Can't write data\n");
@@ -2646,14 +2645,14 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 		    if (ret < 0) {
 			fprintf(stderr, "failed save to %s\n",
 				output ? output : "-");
-			progresult = XMLLINT_ERR_OUT;
+			xmllint_progresult = XMLLINT_ERR_OUT;
 		    }
 		} else if (format == 1) {
 		    ret = xmlSaveFormatFile(output ? output : "-", doc, 1);
 		    if (ret < 0) {
 			fprintf(stderr, "failed save to %s\n",
 				output ? output : "-");
-			progresult = XMLLINT_ERR_OUT;
+			xmllint_progresult = XMLLINT_ERR_OUT;
 		    }
 		} else {
 		    FILE *out;
@@ -2664,13 +2663,13 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 		    }
 		    if (out != NULL) {
 			if (xmlDocDump(out, doc) < 0)
-			    progresult = XMLLINT_ERR_OUT;
+			    xmllint_progresult = XMLLINT_ERR_OUT;
 
 			if (output != NULL)
 			    fclose(out);
 		    } else {
 			fprintf(stderr, "failed to open %s\n", output);
-			progresult = XMLLINT_ERR_OUT;
+			xmllint_progresult = XMLLINT_ERR_OUT;
 		    }
 		}
 	    } else {
@@ -2696,15 +2695,15 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 		    if (xmlSaveDoc(ctxt, doc) < 0) {
 			fprintf(stderr, "failed save to %s\n",
 				output ? output : "-");
-			progresult = XMLLINT_ERR_OUT;
+			xmllint_progresult = XMLLINT_ERR_OUT;
 		    }
 		    xmlSaveClose(ctxt);
 		} else {
-		    progresult = XMLLINT_ERR_OUT;
+		    xmllint_progresult = XMLLINT_ERR_OUT;
 		}
 	    }
 	    if ((timing) && (!repeat)) {
-		endTimer("Saving");
+		xmllint_endTimer("Saving");
 	    }
 #ifdef LIBXML_DEBUG_ENABLED
 	} else {
@@ -2721,7 +2720,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 		    fclose(out);
 	    } else {
 		fprintf(stderr, "failed to open %s\n", output);
-		progresult = XMLLINT_ERR_OUT;
+		xmllint_progresult = XMLLINT_ERR_OUT;
 	    }
 	}
 #endif
@@ -2736,14 +2735,14 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	xmlDtdPtr dtd;
 
 	if ((timing) && (!repeat)) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 	if (dtdvalid != NULL)
 	    dtd = xmlParseDTD(NULL, (const xmlChar *)dtdvalid);
 	else
 	    dtd = xmlParseDTD((const xmlChar *)dtdvalidfpi, NULL);
 	if ((timing) && (!repeat)) {
-	    endTimer("Parsing DTD");
+	    xmllint_endTimer("Parsing DTD");
 	}
 	if (dtd == NULL) {
 	    if (dtdvalid != NULL)
@@ -2752,7 +2751,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	    else
 		xmlGenericError(xmlGenericErrorContext,
 			"Could not parse DTD %s\n", dtdvalidfpi);
-	    progresult = XMLLINT_ERR_DTD;
+	    xmllint_progresult = XMLLINT_ERR_DTD;
 	} else {
 	    xmlValidCtxtPtr cvp;
 
@@ -2766,7 +2765,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	    cvp->warning  = (xmlValidityWarningFunc) fprintf;
 
 	    if ((timing) && (!repeat)) {
-		startTimer();
+		xmllint_startTimer();
 	    }
 	    if (!xmlValidateDtd(cvp, doc, dtd)) {
 		if (dtdvalid != NULL)
@@ -2777,10 +2776,10 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 		    xmlGenericError(xmlGenericErrorContext,
 			    "Document %s does not validate against %s\n",
 			    filename, dtdvalidfpi);
-		progresult = XMLLINT_ERR_VALID;
+		xmllint_progresult = XMLLINT_ERR_VALID;
 	    }
 	    if ((timing) && (!repeat)) {
-		endTimer("Validating against DTD");
+		xmllint_endTimer("Validating against DTD");
 	    }
 	    xmlFreeValidCtxt(cvp);
 	    xmlFreeDtd(dtd);
@@ -2795,7 +2794,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	}
 
 	if ((timing) && (!repeat)) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 	cvp->userData = (void *) stderr;
 	cvp->error    = (xmlValidityErrorFunc) fprintf;
@@ -2803,10 +2802,10 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	if (!xmlValidateDocument(cvp, doc)) {
 	    xmlGenericError(xmlGenericErrorContext,
 		    "Document %s does not validate\n", filename);
-	    progresult = XMLLINT_ERR_VALID;
+	    xmllint_progresult = XMLLINT_ERR_VALID;
 	}
 	if ((timing) && (!repeat)) {
-	    endTimer("Validating");
+	    xmllint_endTimer("Validating");
 	}
 	xmlFreeValidCtxt(cvp);
     }
@@ -2818,7 +2817,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	int flag;
 
 	if ((timing) && (!repeat)) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 
 	if (debug)
@@ -2839,15 +2838,15 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	    fprintf(stderr, "%s validates\n", filename);
 	} else if (ret > 0) {
 	    fprintf(stderr, "%s fails to validate\n", filename);
-	    progresult = XMLLINT_ERR_VALID;
+	    xmllint_progresult = XMLLINT_ERR_VALID;
 	} else {
 	    fprintf(stderr, "%s validation generated an internal error\n",
 		   filename);
-	    progresult = XMLLINT_ERR_VALID;
+	    xmllint_progresult = XMLLINT_ERR_VALID;
 	}
 	xmlSchematronFreeValidCtxt(ctxt);
 	if ((timing) && (!repeat)) {
-	    endTimer("Validating");
+	    xmllint_endTimer("Validating");
 	}
     }
 #endif
@@ -2857,7 +2856,7 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	int ret;
 
 	if ((timing) && (!repeat)) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 
 	ctxt = xmlRelaxNGNewValidCtxt(relaxngschemas);
@@ -2870,22 +2869,22 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	    fprintf(stderr, "%s validates\n", filename);
 	} else if (ret > 0) {
 	    fprintf(stderr, "%s fails to validate\n", filename);
-	    progresult = XMLLINT_ERR_VALID;
+	    xmllint_progresult = XMLLINT_ERR_VALID;
 	} else {
 	    fprintf(stderr, "%s validation generated an internal error\n",
 		   filename);
-	    progresult = XMLLINT_ERR_VALID;
+	    xmllint_progresult = XMLLINT_ERR_VALID;
 	}
 	xmlRelaxNGFreeValidCtxt(ctxt);
 	if ((timing) && (!repeat)) {
-	    endTimer("Validating");
+	    xmllint_endTimer("Validating");
 	}
     } else if (wxschemas != NULL) {
 	xmlSchemaValidCtxtPtr ctxt;
 	int ret;
 
 	if ((timing) && (!repeat)) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 
 	ctxt = xmlSchemaNewValidCtxt(wxschemas);
@@ -2898,15 +2897,15 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
 	    fprintf(stderr, "%s validates\n", filename);
 	} else if (ret > 0) {
 	    fprintf(stderr, "%s fails to validate\n", filename);
-	    progresult = XMLLINT_ERR_VALID;
+	    xmllint_progresult = XMLLINT_ERR_VALID;
 	} else {
 	    fprintf(stderr, "%s validation generated an internal error\n",
 		   filename);
-	    progresult = XMLLINT_ERR_VALID;
+	    xmllint_progresult = XMLLINT_ERR_VALID;
 	}
 	xmlSchemaFreeValidCtxt(ctxt);
 	if ((timing) && (!repeat)) {
-	    endTimer("Validating");
+	    xmllint_endTimer("Validating");
 	}
     }
 #endif
@@ -2922,11 +2921,11 @@ static void parseAndPrintFile(char *filename, xmlParserCtxtPtr rectxt) {
      * free it.
      */
     if ((timing) && (!repeat)) {
-	startTimer();
+	xmllint_startTimer();
     }
     xmlFreeDoc(doc);
     if ((timing) && (!repeat)) {
-	endTimer("Freeing");
+	xmllint_endTimer("Freeing");
     }
 }
 
@@ -3549,7 +3548,7 @@ main(int argc, char **argv) {
         xmlLoadExtDtdDefaultValue |= 1;
 	options |= XML_PARSE_DTDLOAD;
 	if (timing) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 	ctxt = xmlSchematronNewParserCtxt(schematron);
 #if 0
@@ -3562,12 +3561,12 @@ main(int argc, char **argv) {
 	if (wxschematron == NULL) {
 	    xmlGenericError(xmlGenericErrorContext,
 		    "Schematron schema %s failed to compile\n", schematron);
-            progresult = XMLLINT_ERR_SCHEMACOMP;
+            xmllint_progresult = XMLLINT_ERR_SCHEMACOMP;
 	    schematron = NULL;
 	}
 	xmlSchematronFreeParserCtxt(ctxt);
 	if (timing) {
-	    endTimer("Compiling the schemas");
+	    xmllint_endTimer("Compiling the schemas");
 	}
     }
 #endif
@@ -3583,7 +3582,7 @@ main(int argc, char **argv) {
         xmlLoadExtDtdDefaultValue |= 1;
 	options |= XML_PARSE_DTDLOAD;
 	if (timing) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 	ctxt = xmlRelaxNGNewParserCtxt(relaxng);
 	xmlRelaxNGSetParserErrors(ctxt,
@@ -3594,12 +3593,12 @@ main(int argc, char **argv) {
 	if (relaxngschemas == NULL) {
 	    xmlGenericError(xmlGenericErrorContext,
 		    "Relax-NG schema %s failed to compile\n", relaxng);
-            progresult = XMLLINT_ERR_SCHEMACOMP;
+            xmllint_progresult = XMLLINT_ERR_SCHEMACOMP;
 	    relaxng = NULL;
 	}
 	xmlRelaxNGFreeParserCtxt(ctxt);
 	if (timing) {
-	    endTimer("Compiling the schemas");
+	    xmllint_endTimer("Compiling the schemas");
 	}
     } else if ((schema != NULL)
 #ifdef LIBXML_READER_ENABLED
@@ -3609,7 +3608,7 @@ main(int argc, char **argv) {
 	xmlSchemaParserCtxtPtr ctxt;
 
 	if (timing) {
-	    startTimer();
+	    xmllint_startTimer();
 	}
 	ctxt = xmlSchemaNewParserCtxt(schema);
 	xmlSchemaSetParserErrors(ctxt,
@@ -3620,12 +3619,12 @@ main(int argc, char **argv) {
 	if (wxschemas == NULL) {
 	    xmlGenericError(xmlGenericErrorContext,
 		    "WXS schema %s failed to compile\n", schema);
-            progresult = XMLLINT_ERR_SCHEMACOMP;
+            xmllint_progresult = XMLLINT_ERR_SCHEMACOMP;
 	    schema = NULL;
 	}
 	xmlSchemaFreeParserCtxt(ctxt);
 	if (timing) {
-	    endTimer("Compiling the schemas");
+	    xmllint_endTimer("Compiling the schemas");
 	}
     }
 #endif /* LIBXML_SCHEMAS_ENABLED */
@@ -3639,7 +3638,7 @@ main(int argc, char **argv) {
 	if (patternc == NULL) {
 	    xmlGenericError(xmlGenericErrorContext,
 		    "Pattern %s failed to compile\n", pattern);
-            progresult = XMLLINT_ERR_SCHEMAPAT;
+            xmllint_progresult = XMLLINT_ERR_SCHEMAPAT;
 	    pattern = NULL;
 	}
     }
@@ -3712,7 +3711,7 @@ main(int argc, char **argv) {
 	}
 #endif
 	if ((timing) && (repeat))
-	    startTimer();
+	    xmllint_startTimer();
 	/* Remember file names.  "-" means stdin.  <sven@zen.org> */
 	if ((argv[i][0] != '-') || (strcmp(argv[i], "-") == 0)) {
 	    if (repeat) {
@@ -3753,12 +3752,12 @@ main(int argc, char **argv) {
 
                 if ((chkregister) && (nbregister != 0)) {
 		    fprintf(stderr, "Registration count off: %d\n", nbregister);
-		    progresult = XMLLINT_ERR_RDREGIS;
+		    xmllint_progresult = XMLLINT_ERR_RDREGIS;
 		}
 	    }
 	    files ++;
 	    if ((timing) && (repeat)) {
-		endTimer("%d iterations", repeat);
+		xmllint_endTimer("%d iterations", repeat);
 	    }
 	}
     }
@@ -3788,6 +3787,6 @@ main(int argc, char **argv) {
     xmlCleanupParser();
     xmlMemoryDump();
 
-    return(progresult);
+    return(xmllint_progresult);
 }
 

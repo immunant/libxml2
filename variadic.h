@@ -21,6 +21,23 @@
 #endif
 #endif
 
+// from xmllint.c:
+void xmlHTMLEncodeSend(void);
+#if defined(HAVE_GETTIMEOFDAY)
+void XMLCDECL LIBXML_ATTR_FORMAT(1,2) xmllint_endTimer(const char *fmt, ...);
+#elif defined(HAVE_TIME_H)
+void XMLCDECL LIBXML_ATTR_FORMAT(1,2) xmllint_endTimer(const char *fmt, ...);
+#else
+void XMLCDECL LIBXML_ATTR_FORMAT(1,2) xmllint_endTimer(char *format, ...);
+#endif
+void XMLCDECL LIBXML_ATTR_FORMAT(2,3) xmlHTMLError(void *ctx, const char *msg, ...);
+void XMLCDECL LIBXML_ATTR_FORMAT(2,3) xmlHTMLWarning(void *ctx, const char *msg, ...);
+void XMLCDECL LIBXML_ATTR_FORMAT(2,3) xmlHTMLValidityError(void *ctx, const char *msg, ...);
+void XMLCDECL LIBXML_ATTR_FORMAT(2,3) xmlHTMLValidityWarning(void *ctx, const char *msg, ...);
+void XMLCDECL LIBXML_ATTR_FORMAT(2,3) xmllint_warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...);
+void XMLCDECL LIBXML_ATTR_FORMAT(2,3) xmllint_errorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...);
+void XMLCDECL LIBXML_ATTR_FORMAT(2,3) xmllint_fatalErrorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...);
+
 // from xmlreader.c:
 typedef enum {
     XML_TEXTREADER_NONE = -1,
