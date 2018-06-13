@@ -14,10 +14,6 @@
 // #include "libxml2.h"
 #include "variadic.h"
 
-// Structure declarations
-
-
-// Extern functions
 // from error.c:
 void xmlReportError(xmlErrorPtr err, xmlParserCtxtPtr ctxt, const char *str, xmlGenericErrorFunc channel, void *data);
 
@@ -988,3 +984,178 @@ channel_testrecurse(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...) {
     }
     testErrors_recurse[testErrorsSize_recurse] = 0;
 }
+
+// from testHTML.c:
+void XMLCDECL
+testHTML_warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+{
+    va_list args;
+
+    va_start(args, msg);
+    fprintf(stdout, "SAX.warning: ");
+    vfprintf(stdout, msg, args);
+    va_end(args);
+}
+void XMLCDECL
+testHTML_errorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+{
+    va_list args;
+
+    va_start(args, msg);
+    fprintf(stdout, "SAX.error: ");
+    vfprintf(stdout, msg, args);
+    va_end(args);
+}
+void XMLCDECL
+testHTML_fatalErrorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+{
+    va_list args;
+
+    va_start(args, msg);
+    fprintf(stdout, "SAX.fatalError: ");
+    vfprintf(stdout, msg, args);
+    va_end(args);
+}
+
+// from testSAX.c:
+extern int testSAX_callbacks;
+extern int testSAX_quiet;
+void XMLCDECL
+testSAX_warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+{
+    va_list args;
+
+    testSAX_callbacks++;
+    if (testSAX_quiet)
+	return;
+    va_start(args, msg);
+    fprintf(stdout, "SAX.warning: ");
+    vfprintf(stdout, msg, args);
+    va_end(args);
+}
+void XMLCDECL
+testSAX_errorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+{
+    va_list args;
+
+    testSAX_callbacks++;
+    if (testSAX_quiet)
+	return;
+    va_start(args, msg);
+    fprintf(stdout, "SAX.error: ");
+    vfprintf(stdout, msg, args);
+    va_end(args);
+}
+void XMLCDECL
+testSAX_fatalErrorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+{
+    va_list args;
+
+    testSAX_callbacks++;
+    if (testSAX_quiet)
+	return;
+    va_start(args, msg);
+    fprintf(stdout, "SAX.fatalError: ");
+    vfprintf(stdout, msg, args);
+    va_end(args);
+}
+#if defined(HAVE_GETTIMEOFDAY)
+static struct timeval testSAX_begin, testSAX_end;
+
+/*
+ * testSAX_startTimer: call where you want to start timing
+ */
+void
+testSAX_startTimer(void)
+{
+    gettimeofday(&testSAX_begin, NULL);
+}
+
+/*
+ * testSAX_endTimer: call where you want to stop timing and to print out a
+ *           message about the timing performed; format is a printf
+ *           type argument
+ */
+void XMLCDECL
+testSAX_endTimer(const char *fmt, ...)
+{
+    long msec;
+    va_list ap;
+
+    gettimeofday(&testSAX_end, NULL);
+    msec = testSAX_end.tv_sec - testSAX_begin.tv_sec;
+    msec *= 1000;
+    msec += (testSAX_end.tv_usec - testSAX_begin.tv_usec) / 1000;
+
+#ifndef HAVE_STDARG_H
+#error "testSAX_endTimer required stdarg functions"
+#endif
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+
+    fprintf(stderr, " took %ld ms\n", msec);
+}
+#elif defined(HAVE_TIME_H)
+/*
+ * No gettimeofday function, so we have to make do with calling clock.
+ * This is obviously less accurate, but there's little we can do about
+ * that.
+ */
+#ifndef CLOCKS_PER_SEC
+#define CLOCKS_PER_SEC 100
+#endif
+
+static clock_t testSAX_begin, testSAX_end;
+void
+testSAX_startTimer(void)
+{
+    testSAX_begin = clock();
+}
+void XMLCDECL
+testSAX_endTimer(const char *fmt, ...)
+{
+    long msec;
+    va_list ap;
+
+    testSAX_end = clock();
+    msec = ((testSAX_end - testSAX_begin) * 1000) / CLOCKS_PER_SEC;
+
+#ifndef HAVE_STDARG_H
+#error "testSAX_endTimer required stdarg functions"
+#endif
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    va_end(ap);
+    fprintf(stderr, " took %ld ms\n", msec);
+}
+#else
+
+/*
+ * We don't have a gettimeofday or time.h, so we just don't do timing
+ */
+void
+testSAX_startTimer(void)
+{
+    /*
+     * Do nothing
+     */
+}
+void XMLCDECL
+testSAX_endTimer(const char *format, ...)
+{
+    /*
+     * We cannot do anything because we don't have a timing function
+     */
+#ifdef HAVE_STDARG_H
+    va_start(ap, format);
+    vfprintf(stderr, format, ap);
+    va_end(ap);
+    fprintf(stderr, " was not timed\n", msec);
+#else
+    /* We don't have gettimeofday, time or stdarg.h, what crazy world is
+     * this ?!
+     */
+#endif
+}
+#endif

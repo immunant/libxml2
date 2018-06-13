@@ -12,7 +12,7 @@
 
 #include <string.h>
 #include <stdarg.h>
-
+#include "variadic.h"
 
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
@@ -523,16 +523,16 @@ commentDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *value)
  * Display and format a warning messages, gives file, line, position and
  * extra parameters.
  */
-static void XMLCDECL
-warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
-{
-    va_list args;
+// static void XMLCDECL
+// warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+// {
+//     va_list args;
 
-    va_start(args, msg);
-    fprintf(stdout, "SAX.warning: ");
-    vfprintf(stdout, msg, args);
-    va_end(args);
-}
+//     va_start(args, msg);
+//     fprintf(stdout, "SAX.warning: ");
+//     vfprintf(stdout, msg, args);
+//     va_end(args);
+// }
 
 /**
  * errorDebug:
@@ -543,16 +543,16 @@ warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
  * Display and format a error messages, gives file, line, position and
  * extra parameters.
  */
-static void XMLCDECL
-errorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
-{
-    va_list args;
+// static void XMLCDECL
+// errorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+// {
+//     va_list args;
 
-    va_start(args, msg);
-    fprintf(stdout, "SAX.error: ");
-    vfprintf(stdout, msg, args);
-    va_end(args);
-}
+//     va_start(args, msg);
+//     fprintf(stdout, "SAX.error: ");
+//     vfprintf(stdout, msg, args);
+//     va_end(args);
+// }
 
 /**
  * fatalErrorDebug:
@@ -563,16 +563,16 @@ errorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
  * Display and format a fatalError messages, gives file, line, position and
  * extra parameters.
  */
-static void XMLCDECL
-fatalErrorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
-{
-    va_list args;
+// static void XMLCDECL
+// fatalErrorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+// {
+//     va_list args;
 
-    va_start(args, msg);
-    fprintf(stdout, "SAX.fatalError: ");
-    vfprintf(stdout, msg, args);
-    va_end(args);
-}
+//     va_start(args, msg);
+//     fprintf(stdout, "SAX.fatalError: ");
+//     vfprintf(stdout, msg, args);
+//     va_end(args);
+// }
 
 static xmlSAXHandler debugSAXHandlerStruct = {
     internalSubsetDebug,
@@ -596,9 +596,9 @@ static xmlSAXHandler debugSAXHandlerStruct = {
     ignorableWhitespaceDebug,
     processingInstructionDebug,
     commentDebug,
-    warningDebug,
-    errorDebug,
-    fatalErrorDebug,
+    testHTML_warningDebug,
+    testHTML_errorDebug,
+    testHTML_fatalErrorDebug,
     getParameterEntityDebug,
     cdataDebug,
     NULL,
