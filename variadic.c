@@ -11,7 +11,7 @@
 #include <sys/select.h>
 #endif
 
-// #include "libxml2.h"
+#include "libxml.h"
 #include "variadic.h"
 
 // from error.c:

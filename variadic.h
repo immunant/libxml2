@@ -195,6 +195,7 @@ void XMLCDECL xmlGenericErrorDefaultFunc (void *ctx ATTRIBUTE_UNUSED, const char
 void XMLCDECL xmlNoValidityErr(void *ctx ATTRIBUTE_UNUSED, const char *msg ATTRIBUTE_UNUSED, ...);
 
 // from xmlreader.c:
+void xmlTextReaderGenericError(void *ctxt, xmlParserSeverities severity, char *str);
 void XMLCDECL xmlTextReaderValidityErrorRelay(void *ctx, const char *msg, ...);
 void XMLCDECL xmlTextReaderValidityWarningRelay(void *ctx, const char *msg, ...);
 void XMLCDECL LIBXML_ATTR_FORMAT(2,3) xmlTextReaderError(void *ctxt, const char *msg, ...);
