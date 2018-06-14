@@ -268,7 +268,6 @@ extern int xmlNanoFTPReadResponse(void *ctx);
  * moved the `channel` function as well as some variables, and renamed them.
  */
 void XMLCDECL channel_testrecurse(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...);
-#endif
 
 // from testHTML.c:
 void XMLCDECL testHTML_warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...);
@@ -281,3 +280,13 @@ void XMLCDECL testSAX_errorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ..
 void XMLCDECL testSAX_fatalErrorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...);
 void testSAX_startTimer(void);
 void XMLCDECL testSAX_endTimer(const char *format, ...);
+
+// from runtest.c:
+void XMLCDECL channel_runtest(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...);
+void XMLCDECL testErrorHandler_runtest(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...);
+void XMLCDECL warningDebug_runtest(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...);
+void XMLCDECL errorDebug_runtest(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...);
+void XMLCDECL fatalErrorDebug_runtest(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...);
+void ignoreGenericError_runtest(void *ctx ATTRIBUTE_UNUSED, const char *msg ATTRIBUTE_UNUSED, ...);
+
+#endif

@@ -1463,3 +1463,134 @@ testSAX_endTimer(const char *format, ...)
 #endif
 }
 #endif
+
+/*
+ * Trapping the error messages at the generic level to grab the equivalent of
+ * stderr messages on CLI tools.
+ */
+char testErrors_runtest[32769];
+int testErrorsSize_runtest = 0;
+
+void XMLCDECL
+testErrorHandler_runtest(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...) {
+    va_list args;
+    int res;
+
+    if (testErrorsSize_runtest >= 32768)
+        return;
+    va_start(args, msg);
+    res = vsnprintf(&testErrors_runtest[testErrorsSize_runtest],
+                    32768 - testErrorsSize_runtest,
+		    msg, args);
+    va_end(args);
+    if (testErrorsSize_runtest + res >= 32768) {
+        /* buffer is full */
+	testErrorsSize_runtest = 32768;
+	testErrors_runtest[testErrorsSize_runtest] = 0;
+    } else {
+        testErrorsSize_runtest += res;
+    }
+    testErrors_runtest[testErrorsSize_runtest] = 0;
+}
+
+void XMLCDECL
+channel_runtest(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...) {
+    va_list args;
+    int res;
+
+    if (testErrorsSize_runtest >= 32768)
+        return;
+    va_start(args, msg);
+    res = vsnprintf(&testErrors_runtest[testErrorsSize_runtest],
+                    32768 - testErrorsSize_runtest,
+		    msg, args);
+    va_end(args);
+    if (testErrorsSize_runtest + res >= 32768) {
+        /* buffer is full */
+	testErrorsSize_runtest = 32768;
+	testErrors_runtest[testErrorsSize_runtest] = 0;
+    } else {
+        testErrorsSize_runtest += res;
+    }
+    testErrors_runtest[testErrorsSize_runtest] = 0;
+}
+
+
+
+int callbacks_runtest = 0;
+int quiet_runtest = 0;
+FILE *SAXdebug_runtest = NULL;
+
+/**
+ * warningDebug:
+ * @ctxt:  An XML parser context
+ * @msg:  the message to display/transmit
+ * @...:  extra parameters for the message display
+ *
+ * Display and format a warning messages, gives file, line, position and
+ * extra parameters.
+ */
+void XMLCDECL
+warningDebug_runtest(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+{
+    va_list args;
+
+    callbacks_runtest++;
+    if (quiet_runtest)
+	return;
+    va_start(args, msg);
+    fprintf(SAXdebug_runtest, "SAX.warning: ");
+    vfprintf(SAXdebug_runtest, msg, args);
+    va_end(args);
+}
+
+/**
+ * errorDebug:
+ * @ctxt:  An XML parser context
+ * @msg:  the message to display/transmit
+ * @...:  extra parameters for the message display
+ *
+ * Display and format a error messages, gives file, line, position and
+ * extra parameters.
+ */
+void XMLCDECL
+errorDebug_runtest(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+{
+    va_list args;
+
+    callbacks_runtest++;
+    if (quiet_runtest)
+	return;
+    va_start(args, msg);
+    fprintf(SAXdebug_runtest, "SAX.error: ");
+    vfprintf(SAXdebug_runtest, msg, args);
+    va_end(args);
+}
+
+/**
+ * fatalErrorDebug:
+ * @ctxt:  An XML parser context
+ * @msg:  the message to display/transmit
+ * @...:  extra parameters for the message display
+ *
+ * Display and format a fatalError messages, gives file, line, position and
+ * extra parameters.
+ */
+void XMLCDECL
+fatalErrorDebug_runtest(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
+{
+    va_list args;
+
+    callbacks_runtest++;
+    if (quiet_runtest)
+	return;
+    va_start(args, msg);
+    fprintf(SAXdebug_runtest, "SAX.fatalError: ");
+    vfprintf(SAXdebug_runtest, msg, args);
+    va_end(args);
+}
+
+void
+ignoreGenericError_runtest(void *ctx ATTRIBUTE_UNUSED,
+        const char *msg ATTRIBUTE_UNUSED, ...) {
+}

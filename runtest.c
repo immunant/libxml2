@@ -12,6 +12,7 @@
  */
 
 #include "libxml.h"
+#include "variadic.h"
 #include <stdio.h>
 
 #if !defined(_WIN32) || defined(__CYGWIN__)
@@ -243,52 +244,9 @@ testExternalEntityLoader(const char *URL, const char *ID,
  * Trapping the error messages at the generic level to grab the equivalent of
  * stderr messages on CLI tools.
  */
-static char testErrors[32769];
-static int testErrorsSize = 0;
+extern char testErrors_runtest[32769];
+extern int testErrorsSize_runtest;
 
-static void XMLCDECL
-testErrorHandler(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...) {
-    va_list args;
-    int res;
-
-    if (testErrorsSize >= 32768)
-        return;
-    va_start(args, msg);
-    res = vsnprintf(&testErrors[testErrorsSize],
-                    32768 - testErrorsSize,
-		    msg, args);
-    va_end(args);
-    if (testErrorsSize + res >= 32768) {
-        /* buffer is full */
-	testErrorsSize = 32768;
-	testErrors[testErrorsSize] = 0;
-    } else {
-        testErrorsSize += res;
-    }
-    testErrors[testErrorsSize] = 0;
-}
-
-static void XMLCDECL
-channel(void *ctx  ATTRIBUTE_UNUSED, const char *msg, ...) {
-    va_list args;
-    int res;
-
-    if (testErrorsSize >= 32768)
-        return;
-    va_start(args, msg);
-    res = vsnprintf(&testErrors[testErrorsSize],
-                    32768 - testErrorsSize,
-		    msg, args);
-    va_end(args);
-    if (testErrorsSize + res >= 32768) {
-        /* buffer is full */
-	testErrorsSize = 32768;
-	testErrors[testErrorsSize] = 0;
-    } else {
-        testErrorsSize += res;
-    }
-    testErrors[testErrorsSize] = 0;
-}
 
 /**
  * xmlParserPrintFileContext:
@@ -395,79 +353,79 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
         }
         if (input != NULL) {
             if (input->filename)
-                channel(data, "%s:%d: ", input->filename, input->line);
+                channel_runtest(data, "%s:%d: ", input->filename, input->line);
             else if ((line != 0) && (domain == XML_FROM_PARSER))
-                channel(data, "Entity: line %d: ", input->line);
+                channel_runtest(data, "Entity: line %d: ", input->line);
         }
     } else {
         if (file != NULL)
-            channel(data, "%s:%d: ", file, line);
+            channel_runtest(data, "%s:%d: ", file, line);
         else if ((line != 0) && (domain == XML_FROM_PARSER))
-            channel(data, "Entity: line %d: ", line);
+            channel_runtest(data, "Entity: line %d: ", line);
     }
     if (name != NULL) {
-        channel(data, "element %s: ", name);
+        channel_runtest(data, "element %s: ", name);
     }
     if (code == XML_ERR_OK)
         return;
     switch (domain) {
         case XML_FROM_PARSER:
-            channel(data, "parser ");
+            channel_runtest(data, "parser ");
             break;
         case XML_FROM_NAMESPACE:
-            channel(data, "namespace ");
+            channel_runtest(data, "namespace ");
             break;
         case XML_FROM_DTD:
         case XML_FROM_VALID:
-            channel(data, "validity ");
+            channel_runtest(data, "validity ");
             break;
         case XML_FROM_HTML:
-            channel(data, "HTML parser ");
+            channel_runtest(data, "HTML parser ");
             break;
         case XML_FROM_MEMORY:
-            channel(data, "memory ");
+            channel_runtest(data, "memory ");
             break;
         case XML_FROM_OUTPUT:
-            channel(data, "output ");
+            channel_runtest(data, "output ");
             break;
         case XML_FROM_IO:
-            channel(data, "I/O ");
+            channel_runtest(data, "I/O ");
             break;
         case XML_FROM_XINCLUDE:
-            channel(data, "XInclude ");
+            channel_runtest(data, "XInclude ");
             break;
         case XML_FROM_XPATH:
-            channel(data, "XPath ");
+            channel_runtest(data, "XPath ");
             break;
         case XML_FROM_XPOINTER:
-            channel(data, "parser ");
+            channel_runtest(data, "parser ");
             break;
         case XML_FROM_REGEXP:
-            channel(data, "regexp ");
+            channel_runtest(data, "regexp ");
             break;
         case XML_FROM_MODULE:
-            channel(data, "module ");
+            channel_runtest(data, "module ");
             break;
         case XML_FROM_SCHEMASV:
-            channel(data, "Schemas validity ");
+            channel_runtest(data, "Schemas validity ");
             break;
         case XML_FROM_SCHEMASP:
-            channel(data, "Schemas parser ");
+            channel_runtest(data, "Schemas parser ");
             break;
         case XML_FROM_RELAXNGP:
-            channel(data, "Relax-NG parser ");
+            channel_runtest(data, "Relax-NG parser ");
             break;
         case XML_FROM_RELAXNGV:
-            channel(data, "Relax-NG validity ");
+            channel_runtest(data, "Relax-NG validity ");
             break;
         case XML_FROM_CATALOG:
-            channel(data, "Catalog ");
+            channel_runtest(data, "Catalog ");
             break;
         case XML_FROM_C14N:
-            channel(data, "C14N ");
+            channel_runtest(data, "C14N ");
             break;
         case XML_FROM_XSLT:
-            channel(data, "XSLT ");
+            channel_runtest(data, "XSLT ");
             break;
         default:
             break;
@@ -476,16 +434,16 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
         return;
     switch (level) {
         case XML_ERR_NONE:
-            channel(data, ": ");
+            channel_runtest(data, ": ");
             break;
         case XML_ERR_WARNING:
-            channel(data, "warning : ");
+            channel_runtest(data, "warning : ");
             break;
         case XML_ERR_ERROR:
-            channel(data, "error : ");
+            channel_runtest(data, "error : ");
             break;
         case XML_ERR_FATAL:
-            channel(data, "error : ");
+            channel_runtest(data, "error : ");
             break;
     }
     if (code == XML_ERR_OK)
@@ -494,23 +452,23 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
         int len;
 	len = xmlStrlen((const xmlChar *)str);
 	if ((len > 0) && (str[len - 1] != '\n'))
-	    channel(data, "%s\n", str);
+	    channel_runtest(data, "%s\n", str);
 	else
-	    channel(data, "%s", str);
+	    channel_runtest(data, "%s", str);
     } else {
-        channel(data, "%s\n", "out of memory error");
+        channel_runtest(data, "%s\n", "out of memory error");
     }
     if (code == XML_ERR_OK)
         return;
 
     if (ctxt != NULL) {
-        xmlParserPrintFileContextInternal(input, channel, data);
+        xmlParserPrintFileContextInternal(input, channel_runtest, data);
         if (cur != NULL) {
             if (cur->filename)
-                channel(data, "%s:%d: \n", cur->filename, cur->line);
+                channel_runtest(data, "%s:%d: \n", cur->filename, cur->line);
             else if ((line != 0) && (domain == XML_FROM_PARSER))
-                channel(data, "Entity: line %d: \n", cur->line);
-            xmlParserPrintFileContextInternal(cur, channel, data);
+                channel_runtest(data, "Entity: line %d: \n", cur->line);
+            xmlParserPrintFileContextInternal(cur, channel_runtest, data);
         }
     }
     if ((domain == XML_FROM_XPATH) && (err->str1 != NULL) &&
@@ -519,12 +477,12 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
 	xmlChar buf[150];
 	int i;
 
-	channel(data, "%s\n", err->str1);
+	channel_runtest(data, "%s\n", err->str1);
 	for (i=0;i < err->int1;i++)
 	     buf[i] = ' ';
 	buf[i++] = '^';
 	buf[i] = 0;
-	channel(data, "%s\n", buf);
+	channel_runtest(data, "%s\n", buf);
     }
 }
 
@@ -769,7 +727,7 @@ static int unloadMem(const char *mem) {
  *									*
  ************************************************************************/
 
-static FILE *SAXdebug = NULL;
+extern FILE *SAXdebug_runtest;
 
 /*
  * empty SAX block
@@ -810,8 +768,8 @@ static xmlSAXHandler emptySAXHandlerStruct = {
 };
 
 static xmlSAXHandlerPtr emptySAXHandler = &emptySAXHandlerStruct;
-static int callbacks = 0;
-static int quiet = 0;
+extern int callbacks_runtest;
+extern int quiet_runtest;
 
 /**
  * isStandaloneDebug:
@@ -824,10 +782,10 @@ static int quiet = 0;
 static int
 isStandaloneDebug(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return(0);
-    fprintf(SAXdebug, "SAX.isStandalone()\n");
+    fprintf(SAXdebug_runtest, "SAX.isStandalone()\n");
     return(0);
 }
 
@@ -842,10 +800,10 @@ isStandaloneDebug(void *ctx ATTRIBUTE_UNUSED)
 static int
 hasInternalSubsetDebug(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return(0);
-    fprintf(SAXdebug, "SAX.hasInternalSubset()\n");
+    fprintf(SAXdebug_runtest, "SAX.hasInternalSubset()\n");
     return(0);
 }
 
@@ -860,10 +818,10 @@ hasInternalSubsetDebug(void *ctx ATTRIBUTE_UNUSED)
 static int
 hasExternalSubsetDebug(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return(0);
-    fprintf(SAXdebug, "SAX.hasExternalSubset()\n");
+    fprintf(SAXdebug_runtest, "SAX.hasExternalSubset()\n");
     return(0);
 }
 
@@ -877,18 +835,18 @@ static void
 internalSubsetDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name,
 	       const xmlChar *ExternalID, const xmlChar *SystemID)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.internalSubset(%s,", name);
+    fprintf(SAXdebug_runtest, "SAX.internalSubset(%s,", name);
     if (ExternalID == NULL)
-	fprintf(SAXdebug, " ,");
+	fprintf(SAXdebug_runtest, " ,");
     else
-	fprintf(SAXdebug, " %s,", ExternalID);
+	fprintf(SAXdebug_runtest, " %s,", ExternalID);
     if (SystemID == NULL)
-	fprintf(SAXdebug, " )\n");
+	fprintf(SAXdebug_runtest, " )\n");
     else
-	fprintf(SAXdebug, " %s)\n", SystemID);
+	fprintf(SAXdebug_runtest, " %s)\n", SystemID);
 }
 
 /**
@@ -901,18 +859,18 @@ static void
 externalSubsetDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name,
 	       const xmlChar *ExternalID, const xmlChar *SystemID)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.externalSubset(%s,", name);
+    fprintf(SAXdebug_runtest, "SAX.externalSubset(%s,", name);
     if (ExternalID == NULL)
-	fprintf(SAXdebug, " ,");
+	fprintf(SAXdebug_runtest, " ,");
     else
-	fprintf(SAXdebug, " %s,", ExternalID);
+	fprintf(SAXdebug_runtest, " %s,", ExternalID);
     if (SystemID == NULL)
-	fprintf(SAXdebug, " )\n");
+	fprintf(SAXdebug_runtest, " )\n");
     else
-	fprintf(SAXdebug, " %s)\n", SystemID);
+	fprintf(SAXdebug_runtest, " %s)\n", SystemID);
 }
 
 /**
@@ -932,21 +890,21 @@ externalSubsetDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name,
 static xmlParserInputPtr
 resolveEntityDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *publicId, const xmlChar *systemId)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return(NULL);
     /* xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr) ctx; */
 
 
-    fprintf(SAXdebug, "SAX.resolveEntity(");
+    fprintf(SAXdebug_runtest, "SAX.resolveEntity(");
     if (publicId != NULL)
-	fprintf(SAXdebug, "%s", (char *)publicId);
+	fprintf(SAXdebug_runtest, "%s", (char *)publicId);
     else
-	fprintf(SAXdebug, " ");
+	fprintf(SAXdebug_runtest, " ");
     if (systemId != NULL)
-	fprintf(SAXdebug, ", %s)\n", (char *)systemId);
+	fprintf(SAXdebug_runtest, ", %s)\n", (char *)systemId);
     else
-	fprintf(SAXdebug, ", )\n");
+	fprintf(SAXdebug_runtest, ", )\n");
 /*********
     if (systemId != NULL) {
         return(xmlNewInputFromFile(ctxt, (char *) systemId));
@@ -967,10 +925,10 @@ resolveEntityDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *publicId, const xm
 static xmlEntityPtr
 getEntityDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return(NULL);
-    fprintf(SAXdebug, "SAX.getEntity(%s)\n", name);
+    fprintf(SAXdebug_runtest, "SAX.getEntity(%s)\n", name);
     return(NULL);
 }
 
@@ -986,10 +944,10 @@ getEntityDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name)
 static xmlEntityPtr
 getParameterEntityDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return(NULL);
-    fprintf(SAXdebug, "SAX.getParameterEntity(%s)\n", name);
+    fprintf(SAXdebug_runtest, "SAX.getParameterEntity(%s)\n", name);
     return(NULL);
 }
 
@@ -1017,10 +975,10 @@ const xmlChar *nullstr = BAD_CAST "(null)";
         systemId = nullstr;
     if (content == NULL)
         content = (xmlChar *)nullstr;
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.entityDecl(%s, %d, %s, %s, %s)\n",
+    fprintf(SAXdebug_runtest, "SAX.entityDecl(%s, %d, %s, %s, %s)\n",
             name, type, publicId, systemId, content);
 }
 
@@ -1037,14 +995,14 @@ attributeDeclDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar * elem,
                    const xmlChar * name, int type, int def,
                    const xmlChar * defaultValue, xmlEnumerationPtr tree)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
         return;
     if (defaultValue == NULL)
-        fprintf(SAXdebug, "SAX.attributeDecl(%s, %s, %d, %d, NULL, ...)\n",
+        fprintf(SAXdebug_runtest, "SAX.attributeDecl(%s, %s, %d, %d, NULL, ...)\n",
                 elem, name, type, def);
     else
-        fprintf(SAXdebug, "SAX.attributeDecl(%s, %s, %d, %d, %s, ...)\n",
+        fprintf(SAXdebug_runtest, "SAX.attributeDecl(%s, %s, %d, %d, %s, ...)\n",
                 elem, name, type, def, defaultValue);
     xmlFreeEnumeration(tree);
 }
@@ -1062,10 +1020,10 @@ static void
 elementDeclDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name, int type,
 	    xmlElementContentPtr content ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.elementDecl(%s, %d, ...)\n",
+    fprintf(SAXdebug_runtest, "SAX.elementDecl(%s, %d, ...)\n",
             name, type);
 }
 
@@ -1082,10 +1040,10 @@ static void
 notationDeclDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name,
 	     const xmlChar *publicId, const xmlChar *systemId)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.notationDecl(%s, %s, %s)\n",
+    fprintf(SAXdebug_runtest, "SAX.notationDecl(%s, %s, %s)\n",
             (char *) name, (char *) publicId, (char *) systemId);
 }
 
@@ -1112,10 +1070,10 @@ const xmlChar *nullstr = BAD_CAST "(null)";
         systemId = nullstr;
     if (notationName == NULL)
         notationName = nullstr;
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.unparsedEntityDecl(%s, %s, %s, %s)\n",
+    fprintf(SAXdebug_runtest, "SAX.unparsedEntityDecl(%s, %s, %s, %s)\n",
             (char *) name, (char *) publicId, (char *) systemId,
 	    (char *) notationName);
 }
@@ -1131,10 +1089,10 @@ const xmlChar *nullstr = BAD_CAST "(null)";
 static void
 setDocumentLocatorDebug(void *ctx ATTRIBUTE_UNUSED, xmlSAXLocatorPtr loc ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.setDocumentLocator()\n");
+    fprintf(SAXdebug_runtest, "SAX.setDocumentLocator()\n");
 }
 
 /**
@@ -1146,10 +1104,10 @@ setDocumentLocatorDebug(void *ctx ATTRIBUTE_UNUSED, xmlSAXLocatorPtr loc ATTRIBU
 static void
 startDocumentDebug(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.startDocument()\n");
+    fprintf(SAXdebug_runtest, "SAX.startDocument()\n");
 }
 
 /**
@@ -1161,10 +1119,10 @@ startDocumentDebug(void *ctx ATTRIBUTE_UNUSED)
 static void
 endDocumentDebug(void *ctx ATTRIBUTE_UNUSED)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.endDocument()\n");
+    fprintf(SAXdebug_runtest, "SAX.endDocument()\n");
 }
 
 /**
@@ -1179,18 +1137,18 @@ startElementDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name, const xmlChar
 {
     int i;
 
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.startElement(%s", (char *) name);
+    fprintf(SAXdebug_runtest, "SAX.startElement(%s", (char *) name);
     if (atts != NULL) {
         for (i = 0;(atts[i] != NULL);i++) {
-	    fprintf(SAXdebug, ", %s='", atts[i++]);
+	    fprintf(SAXdebug_runtest, ", %s='", atts[i++]);
 	    if (atts[i] != NULL)
-	        fprintf(SAXdebug, "%s'", atts[i]);
+	        fprintf(SAXdebug_runtest, "%s'", atts[i]);
 	}
     }
-    fprintf(SAXdebug, ")\n");
+    fprintf(SAXdebug_runtest, ")\n");
 }
 
 /**
@@ -1203,10 +1161,10 @@ startElementDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name, const xmlChar
 static void
 endElementDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.endElement(%s)\n", (char *) name);
+    fprintf(SAXdebug_runtest, "SAX.endElement(%s)\n", (char *) name);
 }
 
 /**
@@ -1224,14 +1182,14 @@ charactersDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *ch, int len)
     char output[40];
     int i;
 
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
     for (i = 0;(i<len) && (i < 30);i++)
 	output[i] = ch[i];
     output[i] = 0;
 
-    fprintf(SAXdebug, "SAX.characters(%s, %d)\n", output, len);
+    fprintf(SAXdebug_runtest, "SAX.characters(%s, %d)\n", output, len);
 }
 
 /**
@@ -1244,10 +1202,10 @@ charactersDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *ch, int len)
 static void
 referenceDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.reference(%s)\n", name);
+    fprintf(SAXdebug_runtest, "SAX.reference(%s)\n", name);
 }
 
 /**
@@ -1266,13 +1224,13 @@ ignorableWhitespaceDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *ch, int len)
     char output[40];
     int i;
 
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
     for (i = 0;(i<len) && (i < 30);i++)
 	output[i] = ch[i];
     output[i] = 0;
-    fprintf(SAXdebug, "SAX.ignorableWhitespace(%s, %d)\n", output, len);
+    fprintf(SAXdebug_runtest, "SAX.ignorableWhitespace(%s, %d)\n", output, len);
 }
 
 /**
@@ -1288,14 +1246,14 @@ static void
 processingInstructionDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *target,
                       const xmlChar *data)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
     if (data != NULL)
-	fprintf(SAXdebug, "SAX.processingInstruction(%s, %s)\n",
+	fprintf(SAXdebug_runtest, "SAX.processingInstruction(%s, %s)\n",
 		(char *) target, (char *) data);
     else
-	fprintf(SAXdebug, "SAX.processingInstruction(%s, NULL)\n",
+	fprintf(SAXdebug_runtest, "SAX.processingInstruction(%s, NULL)\n",
 		(char *) target);
 }
 
@@ -1310,10 +1268,10 @@ processingInstructionDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *target,
 static void
 cdataBlockDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *value, int len)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.pcdata(%.20s, %d)\n",
+    fprintf(SAXdebug_runtest, "SAX.pcdata(%.20s, %d)\n",
 	    (char *) value, len);
 }
 
@@ -1327,80 +1285,12 @@ cdataBlockDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *value, int len)
 static void
 commentDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *value)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.comment(%s)\n", value);
+    fprintf(SAXdebug_runtest, "SAX.comment(%s)\n", value);
 }
 
-/**
- * warningDebug:
- * @ctxt:  An XML parser context
- * @msg:  the message to display/transmit
- * @...:  extra parameters for the message display
- *
- * Display and format a warning messages, gives file, line, position and
- * extra parameters.
- */
-static void XMLCDECL
-warningDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
-{
-    va_list args;
-
-    callbacks++;
-    if (quiet)
-	return;
-    va_start(args, msg);
-    fprintf(SAXdebug, "SAX.warning: ");
-    vfprintf(SAXdebug, msg, args);
-    va_end(args);
-}
-
-/**
- * errorDebug:
- * @ctxt:  An XML parser context
- * @msg:  the message to display/transmit
- * @...:  extra parameters for the message display
- *
- * Display and format a error messages, gives file, line, position and
- * extra parameters.
- */
-static void XMLCDECL
-errorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
-{
-    va_list args;
-
-    callbacks++;
-    if (quiet)
-	return;
-    va_start(args, msg);
-    fprintf(SAXdebug, "SAX.error: ");
-    vfprintf(SAXdebug, msg, args);
-    va_end(args);
-}
-
-/**
- * fatalErrorDebug:
- * @ctxt:  An XML parser context
- * @msg:  the message to display/transmit
- * @...:  extra parameters for the message display
- *
- * Display and format a fatalError messages, gives file, line, position and
- * extra parameters.
- */
-static void XMLCDECL
-fatalErrorDebug(void *ctx ATTRIBUTE_UNUSED, const char *msg, ...)
-{
-    va_list args;
-
-    callbacks++;
-    if (quiet)
-	return;
-    va_start(args, msg);
-    fprintf(SAXdebug, "SAX.fatalError: ");
-    vfprintf(SAXdebug, msg, args);
-    va_end(args);
-}
 
 static xmlSAXHandler debugSAXHandlerStruct = {
     internalSubsetDebug,
@@ -1424,9 +1314,9 @@ static xmlSAXHandler debugSAXHandlerStruct = {
     ignorableWhitespaceDebug,
     processingInstructionDebug,
     commentDebug,
-    warningDebug,
-    errorDebug,
-    fatalErrorDebug,
+    warningDebug_runtest,
+    errorDebug_runtest,
+    fatalErrorDebug_runtest,
     getParameterEntityDebug,
     cdataBlockDebug,
     externalSubsetDebug,
@@ -1440,7 +1330,7 @@ static xmlSAXHandler debugSAXHandlerStruct = {
 static xmlSAXHandlerPtr debugSAXHandler = &debugSAXHandlerStruct;
 
 /*
- * SAX2 specific callbacks
+ * SAX2 specific callbacks_runtest
  */
 /**
  * startElementNsDebug:
@@ -1462,41 +1352,41 @@ startElementNsDebug(void *ctx ATTRIBUTE_UNUSED,
 {
     int i;
 
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.startElementNs(%s", (char *) localname);
+    fprintf(SAXdebug_runtest, "SAX.startElementNs(%s", (char *) localname);
     if (prefix == NULL)
-	fprintf(SAXdebug, ", NULL");
+	fprintf(SAXdebug_runtest, ", NULL");
     else
-	fprintf(SAXdebug, ", %s", (char *) prefix);
+	fprintf(SAXdebug_runtest, ", %s", (char *) prefix);
     if (URI == NULL)
-	fprintf(SAXdebug, ", NULL");
+	fprintf(SAXdebug_runtest, ", NULL");
     else
-	fprintf(SAXdebug, ", '%s'", (char *) URI);
-    fprintf(SAXdebug, ", %d", nb_namespaces);
+	fprintf(SAXdebug_runtest, ", '%s'", (char *) URI);
+    fprintf(SAXdebug_runtest, ", %d", nb_namespaces);
 
     if (namespaces != NULL) {
         for (i = 0;i < nb_namespaces * 2;i++) {
-	    fprintf(SAXdebug, ", xmlns");
+	    fprintf(SAXdebug_runtest, ", xmlns");
 	    if (namespaces[i] != NULL)
-	        fprintf(SAXdebug, ":%s", namespaces[i]);
+	        fprintf(SAXdebug_runtest, ":%s", namespaces[i]);
 	    i++;
-	    fprintf(SAXdebug, "='%s'", namespaces[i]);
+	    fprintf(SAXdebug_runtest, "='%s'", namespaces[i]);
 	}
     }
-    fprintf(SAXdebug, ", %d, %d", nb_attributes, nb_defaulted);
+    fprintf(SAXdebug_runtest, ", %d, %d", nb_attributes, nb_defaulted);
     if (attributes != NULL) {
         for (i = 0;i < nb_attributes * 5;i += 5) {
 	    if (attributes[i + 1] != NULL)
-		fprintf(SAXdebug, ", %s:%s='", attributes[i + 1], attributes[i]);
+		fprintf(SAXdebug_runtest, ", %s:%s='", attributes[i + 1], attributes[i]);
 	    else
-		fprintf(SAXdebug, ", %s='", attributes[i]);
-	    fprintf(SAXdebug, "%.4s...', %d", attributes[i + 3],
+		fprintf(SAXdebug_runtest, ", %s='", attributes[i]);
+	    fprintf(SAXdebug_runtest, "%.4s...', %d", attributes[i + 3],
 		    (int)(attributes[i + 4] - attributes[i + 3]));
 	}
     }
-    fprintf(SAXdebug, ")\n");
+    fprintf(SAXdebug_runtest, ")\n");
 }
 
 /**
@@ -1512,18 +1402,18 @@ endElementNsDebug(void *ctx ATTRIBUTE_UNUSED,
                   const xmlChar *prefix,
                   const xmlChar *URI)
 {
-    callbacks++;
-    if (quiet)
+    callbacks_runtest++;
+    if (quiet_runtest)
 	return;
-    fprintf(SAXdebug, "SAX.endElementNs(%s", (char *) localname);
+    fprintf(SAXdebug_runtest, "SAX.endElementNs(%s", (char *) localname);
     if (prefix == NULL)
-	fprintf(SAXdebug, ", NULL");
+	fprintf(SAXdebug_runtest, ", NULL");
     else
-	fprintf(SAXdebug, ", %s", (char *) prefix);
+	fprintf(SAXdebug_runtest, ", %s", (char *) prefix);
     if (URI == NULL)
-	fprintf(SAXdebug, ", NULL)\n");
+	fprintf(SAXdebug_runtest, ", NULL)\n");
     else
-	fprintf(SAXdebug, ", '%s')\n", (char *) URI);
+	fprintf(SAXdebug_runtest, ", '%s')\n", (char *) URI);
 }
 
 static xmlSAXHandler debugSAX2HandlerStruct = {
@@ -1548,9 +1438,9 @@ static xmlSAXHandler debugSAX2HandlerStruct = {
     ignorableWhitespaceDebug,
     processingInstructionDebug,
     commentDebug,
-    warningDebug,
-    errorDebug,
-    fatalErrorDebug,
+    warningDebug_runtest,
+    errorDebug_runtest,
+    fatalErrorDebug_runtest,
     getParameterEntityDebug,
     cdataBlockDebug,
     externalSubsetDebug,
@@ -1576,27 +1466,27 @@ htmlstartElementDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name, const xml
 {
     int i;
 
-    fprintf(SAXdebug, "SAX.startElement(%s", (char *) name);
+    fprintf(SAXdebug_runtest, "SAX.startElement(%s", (char *) name);
     if (atts != NULL) {
         for (i = 0;(atts[i] != NULL);i++) {
-	    fprintf(SAXdebug, ", %s", atts[i++]);
+	    fprintf(SAXdebug_runtest, ", %s", atts[i++]);
 	    if (atts[i] != NULL) {
 		unsigned char output[40];
 		const unsigned char *att = atts[i];
 		int outlen, attlen;
-	        fprintf(SAXdebug, "='");
+	        fprintf(SAXdebug_runtest, "='");
 		while ((attlen = strlen((char*)att)) > 0) {
 		    outlen = sizeof output - 1;
 		    htmlEncodeEntities(output, &outlen, att, &attlen, '\'');
 		    output[outlen] = 0;
-		    fprintf(SAXdebug, "%s", (char *) output);
+		    fprintf(SAXdebug_runtest, "%s", (char *) output);
 		    att += attlen;
 		}
-		fprintf(SAXdebug, "'");
+		fprintf(SAXdebug_runtest, "'");
 	    }
 	}
     }
-    fprintf(SAXdebug, ")\n");
+    fprintf(SAXdebug_runtest, ")\n");
 }
 
 /**
@@ -1617,7 +1507,7 @@ htmlcharactersDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *ch, int len)
     htmlEncodeEntities(output, &outlen, ch, &inlen, 0);
     output[outlen] = 0;
 
-    fprintf(SAXdebug, "SAX.characters(%s, %d)\n", output, len);
+    fprintf(SAXdebug_runtest, "SAX.characters(%s, %d)\n", output, len);
 }
 
 /**
@@ -1638,7 +1528,7 @@ htmlcdataDebug(void *ctx ATTRIBUTE_UNUSED, const xmlChar *ch, int len)
     htmlEncodeEntities(output, &outlen, ch, &inlen, 0);
     output[outlen] = 0;
 
-    fprintf(SAXdebug, "SAX.cdata(%s, %d)\n", output, len);
+    fprintf(SAXdebug_runtest, "SAX.cdata(%s, %d)\n", output, len);
 }
 
 static xmlSAXHandler debugHTMLSAXHandlerStruct = {
@@ -1663,9 +1553,9 @@ static xmlSAXHandler debugHTMLSAXHandlerStruct = {
     ignorableWhitespaceDebug,
     processingInstructionDebug,
     commentDebug,
-    warningDebug,
-    errorDebug,
-    fatalErrorDebug,
+    warningDebug_runtest,
+    errorDebug_runtest,
+    fatalErrorDebug_runtest,
     getParameterEntityDebug,
     htmlcdataDebug,
     externalSubsetDebug,
@@ -1702,16 +1592,16 @@ saxParseTest(const char *filename, const char *result,
         fprintf(stderr, "out of memory\n");
         fatalError();
     }
-    SAXdebug = fopen(temp, "wb");
-    if (SAXdebug == NULL) {
+    SAXdebug_runtest = fopen(temp, "wb");
+    if (SAXdebug_runtest == NULL) {
         fprintf(stderr, "Failed to write to %s\n", temp);
 	free(temp);
 	return(-1);
     }
 
-    /* for SAX we really want the callbacks though the context handlers */
+    /* for SAX we really want the callbacks_runtest though the context handlers */
     xmlSetStructuredErrorFunc(NULL, NULL);
-    xmlSetGenericErrorFunc(NULL, testErrorHandler);
+    xmlSetGenericErrorFunc(NULL, testErrorHandler_runtest);
 
 #ifdef LIBXML_HTML_ENABLED
     if (options & XML_PARSE_HTML) {
@@ -1729,7 +1619,7 @@ saxParseTest(const char *filename, const char *result,
         xmlFreeParserCtxt(ctxt);
     }
     if (ret == XML_WAR_UNDECLARED_ENTITY) {
-        fprintf(SAXdebug, "xmlSAXUserParseFile returned error %d\n", ret);
+        fprintf(SAXdebug_runtest, "xmlSAXUserParseFile returned error %d\n", ret);
         ret = 0;
     }
     if (ret != 0) {
@@ -1758,10 +1648,10 @@ saxParseTest(const char *filename, const char *result,
         xmlFreeParserCtxt(ctxt);
     }
     if (ret == XML_WAR_UNDECLARED_ENTITY) {
-        fprintf(SAXdebug, "xmlSAXUserParseFile returned error %d\n", ret);
+        fprintf(SAXdebug_runtest, "xmlSAXUserParseFile returned error %d\n", ret);
         ret = 0;
     }
-    fclose(SAXdebug);
+    fclose(SAXdebug_runtest);
     if (compareFiles(temp, result)) {
         fprintf(stderr, "Got a difference for %s\n", filename);
         ret = 1;
@@ -1944,7 +1834,7 @@ pushParseTest(const char *filename, const char *result,
     }
     xmlFree((char *)base);
     if (err != NULL) {
-	res = compareFileMem(err, testErrors, testErrorsSize);
+	res = compareFileMem(err, testErrors_runtest, testErrorsSize_runtest);
 	if (res != 0) {
 	    fprintf(stderr, "Error for %s failed\n", filename);
 	    return(-1);
@@ -2116,13 +2006,13 @@ errParseTest(const char *filename, const char *result, const char *err,
 	xmlFreeDoc(doc);
     }
     if (err != NULL) {
-	res = compareFileMem(err, testErrors, testErrorsSize);
+	res = compareFileMem(err, testErrors_runtest, testErrorsSize_runtest);
 	if (res != 0) {
 	    fprintf(stderr, "Error for %s failed\n", filename);
 	    return(-1);
 	}
     } else if (options & XML_PARSE_DTDVALID) {
-        if (testErrorsSize != 0)
+        if (testErrorsSize_runtest != 0)
 	    fprintf(stderr, "Validation for %s failed\n", filename);
     }
 
@@ -2191,7 +2081,7 @@ streamProcessTest(const char *filename, const char *result, const char *err,
     if (rng != NULL) {
 	ret = xmlTextReaderRelaxNGValidate(reader, rng);
 	if (ret < 0) {
-	    testErrorHandler(NULL, "Relax-NG schema %s failed to compile\n",
+	    testErrorHandler_runtest(NULL, "Relax-NG schema %s failed to compile\n",
 	                     rng);
 	    fclose(t);
             if (temp != NULL) {
@@ -2210,13 +2100,13 @@ streamProcessTest(const char *filename, const char *result, const char *err,
         ret = xmlTextReaderRead(reader);
     }
     if (ret != 0) {
-        testErrorHandler(NULL, "%s : failed to parse\n", filename);
+        testErrorHandler_runtest(NULL, "%s : failed to parse\n", filename);
     }
     if (rng != NULL) {
         if (xmlTextReaderIsValid(reader) != 1) {
-	    testErrorHandler(NULL, "%s fails to validate\n", filename);
+	    testErrorHandler_runtest(NULL, "%s fails to validate\n", filename);
 	} else {
-	    testErrorHandler(NULL, "%s validates\n", filename);
+	    testErrorHandler_runtest(NULL, "%s validates\n", filename);
 	}
     }
     xmlGetWarningsDefaultValue = 0;
@@ -2233,10 +2123,10 @@ streamProcessTest(const char *filename, const char *result, const char *err,
 	}
     }
     if (err != NULL) {
-	ret = compareFileMem(err, testErrors, testErrorsSize);
+	ret = compareFileMem(err, testErrors_runtest, testErrorsSize_runtest);
 	if (ret != 0) {
 	    fprintf(stderr, "Error for %s failed\n", filename);
-	    printf("%s", testErrors);
+	    printf("%s", testErrors_runtest);
 	    return(-1);
 	}
     }
@@ -2340,13 +2230,8 @@ static FILE *xpathOutput;
 static xmlDocPtr xpathDocument;
 
 static void
-ignoreGenericError(void *ctx ATTRIBUTE_UNUSED,
-        const char *msg ATTRIBUTE_UNUSED, ...) {
-}
-
-static void
 testXPath(const char *str, int xptr, int expr) {
-    xmlGenericErrorFunc handler = ignoreGenericError;
+    xmlGenericErrorFunc handler = ignoreGenericError_runtest;
     xmlXPathObjectPtr res;
     xmlXPathContextPtr ctxt;
 
@@ -2626,7 +2511,7 @@ xmlidDocTest(const char *filename,
     xmlFreeDoc(xpathDocument);
 
     if (err != NULL) {
-	ret = compareFileMem(err, testErrors, testErrorsSize);
+	ret = compareFileMem(err, testErrors_runtest, testErrorsSize_runtest);
 	if (ret != 0) {
 	    fprintf(stderr, "Error for %s failed\n", filename);
 	    res = 1;
@@ -2747,7 +2632,7 @@ uriCommonTest(const char *filename,
 	}
     }
     if (err != NULL) {
-	ret = compareFileMem(err, testErrors, testErrorsSize);
+	ret = compareFileMem(err, testErrors_runtest, testErrorsSize_runtest);
 	if (ret != 0) {
 	    fprintf(stderr, "Error for %s failed\n", filename);
 	    res = 1;
@@ -3012,8 +2897,8 @@ schemasOneTest(const char *sch,
 
     ctxt = xmlSchemaNewValidCtxt(schemas);
     xmlSchemaSetValidErrors(ctxt,
-         (xmlSchemaValidityErrorFunc) testErrorHandler,
-         (xmlSchemaValidityWarningFunc) testErrorHandler,
+         (xmlSchemaValidityErrorFunc) testErrorHandler_runtest,
+         (xmlSchemaValidityWarningFunc) testErrorHandler_runtest,
 	 ctxt);
     validResult = xmlSchemaValidateDoc(ctxt, doc);
     if (validResult == 0) {
@@ -3037,7 +2922,7 @@ schemasOneTest(const char *sch,
     }
 
     if ((validResult != 0) && (err != NULL)) {
-	if (compareFileMem(err, testErrors, testErrorsSize)) {
+	if (compareFileMem(err, testErrors_runtest, testErrorsSize_runtest)) {
 	    fprintf(stderr, "Error for %s on %s failed\n", filename, sch);
 	    ret = 1;
 	}
@@ -3080,8 +2965,8 @@ schemasTest(const char *filename,
     /* first compile the schemas if possible */
     ctxt = xmlSchemaNewParserCtxt(filename);
     xmlSchemaSetParserErrors(ctxt,
-         (xmlSchemaValidityErrorFunc) testErrorHandler,
-         (xmlSchemaValidityWarningFunc) testErrorHandler,
+         (xmlSchemaValidityErrorFunc) testErrorHandler_runtest,
+         (xmlSchemaValidityWarningFunc) testErrorHandler_runtest,
 	 ctxt);
     schemas = xmlSchemaParse(ctxt);
     xmlSchemaFreeParserCtxt(ctxt);
@@ -3116,8 +3001,8 @@ schemasTest(const char *filename,
     globbuf.gl_offs = 0;
     glob(pattern, GLOB_DOOFFS, NULL, &globbuf);
     for (i = 0;i < globbuf.gl_pathc;i++) {
-        testErrorsSize = 0;
-	testErrors[0] = 0;
+        testErrorsSize_runtest = 0;
+	testErrors_runtest[0] = 0;
         instance = globbuf.gl_pathv[i];
 	base2 = baseFilename(instance);
 	len = strlen(base2);
@@ -3187,16 +3072,16 @@ rngOneTest(const char *sch,
 
     ctxt = xmlRelaxNGNewValidCtxt(schemas);
     xmlRelaxNGSetValidErrors(ctxt,
-         (xmlRelaxNGValidityErrorFunc) testErrorHandler,
-         (xmlRelaxNGValidityWarningFunc) testErrorHandler,
+         (xmlRelaxNGValidityErrorFunc) testErrorHandler_runtest,
+         (xmlRelaxNGValidityWarningFunc) testErrorHandler_runtest,
 	 ctxt);
     ret = xmlRelaxNGValidateDoc(ctxt, doc);
     if (ret == 0) {
-	testErrorHandler(NULL, "%s validates\n", filename);
+	testErrorHandler_runtest(NULL, "%s validates\n", filename);
     } else if (ret > 0) {
-	testErrorHandler(NULL, "%s fails to validate\n", filename);
+	testErrorHandler_runtest(NULL, "%s fails to validate\n", filename);
     } else {
-	testErrorHandler(NULL, "%s validation generated an internal error\n",
+	testErrorHandler_runtest(NULL, "%s validation generated an internal error\n",
 	       filename);
     }
     fclose(schemasOutput);
@@ -3213,10 +3098,10 @@ rngOneTest(const char *sch,
     }
 
     if (err != NULL) {
-	if (compareFileMem(err, testErrors, testErrorsSize)) {
+	if (compareFileMem(err, testErrors_runtest, testErrorsSize_runtest)) {
 	    fprintf(stderr, "Error for %s on %s failed\n", filename, sch);
 	    ret = 1;
-	    printf("%s", testErrors);
+	    printf("%s", testErrors_runtest);
 	}
     }
 
@@ -3257,8 +3142,8 @@ rngTest(const char *filename,
     /* first compile the schemas if possible */
     ctxt = xmlRelaxNGNewParserCtxt(filename);
     xmlRelaxNGSetParserErrors(ctxt,
-         (xmlRelaxNGValidityErrorFunc) testErrorHandler,
-         (xmlRelaxNGValidityWarningFunc) testErrorHandler,
+         (xmlRelaxNGValidityErrorFunc) testErrorHandler_runtest,
+         (xmlRelaxNGValidityWarningFunc) testErrorHandler_runtest,
 	 ctxt);
     schemas = xmlRelaxNGParse(ctxt);
     xmlRelaxNGFreeParserCtxt(ctxt);
@@ -3281,8 +3166,8 @@ rngTest(const char *filename,
     globbuf.gl_offs = 0;
     glob(pattern, GLOB_DOOFFS, NULL, &globbuf);
     for (i = 0;i < globbuf.gl_pathc;i++) {
-        testErrorsSize = 0;
-	testErrors[0] = 0;
+        testErrorsSize_runtest = 0;
+	testErrors_runtest[0] = 0;
         instance = globbuf.gl_pathv[i];
 	base2 = baseFilename(instance);
 	len = strlen(base2);
@@ -3370,8 +3255,8 @@ rngStreamTest(const char *filename,
     globbuf.gl_offs = 0;
     glob(pattern, GLOB_DOOFFS, NULL, &globbuf);
     for (i = 0;i < globbuf.gl_pathc;i++) {
-        testErrorsSize = 0;
-	testErrors[0] = 0;
+        testErrorsSize_runtest = 0;
+	testErrors_runtest[0] = 0;
         instance = globbuf.gl_pathv[i];
 	base2 = baseFilename(instance);
 	len = strlen(base2);
@@ -3574,7 +3459,7 @@ patternTest(const char *filename,
 	    patternc = xmlPatterncompile((const xmlChar *) str, doc->dict,
 					 0, &namespaces[0]);
 	    if (patternc == NULL) {
-		testErrorHandler(NULL,
+		testErrorHandler_runtest(NULL,
 			"Pattern %s failed to compile\n", str);
 		xmlFreeDoc(doc);
 		ret = 1;
@@ -4262,14 +4147,14 @@ testDesc testDescriptions[] = {
       0 },
 #endif
 #ifdef LIBXML_SAX1_ENABLED
-    { "SAX1 callbacks regression tests" ,
+    { "SAX1 callbacks_runtest regression tests" ,
       saxParseTest, "./test/*", "result/", ".sax", NULL,
       XML_PARSE_SAX1 },
 #endif
-    { "SAX2 callbacks regression tests" ,
+    { "SAX2 callbacks_runtest regression tests" ,
       saxParseTest, "./test/*", "result/", ".sax2", NULL,
       0 },
-    { "SAX2 callbacks regression tests with entity substitution" ,
+    { "SAX2 callbacks_runtest regression tests with entity substitution" ,
       saxParseTest, "./test/*", "result/noent/", ".sax2", NULL,
       XML_PARSE_NOENT },
 #ifdef LIBXML_PUSH_ENABLED
@@ -4456,8 +4341,8 @@ launchTests(testDescPtr tst) {
 	    } else {
 		mem = xmlMemUsed();
 		extraMemoryFromResolver = 0;
-		testErrorsSize = 0;
-		testErrors[0] = 0;
+		testErrorsSize_runtest = 0;
+		testErrors_runtest[0] = 0;
 		res = tst->func(globbuf.gl_pathv[i], result, error,
 		                tst->options | XML_PARSE_COMPACT);
 		xmlResetLastError();
@@ -4476,7 +4361,7 @@ launchTests(testDescPtr tst) {
 			err++;
 		    }
 		}
-		testErrorsSize = 0;
+		testErrorsSize_runtest = 0;
 	    }
 	    if (result)
 		free(result);
@@ -4485,8 +4370,8 @@ launchTests(testDescPtr tst) {
 	}
 	globfree(&globbuf);
     } else {
-        testErrorsSize = 0;
-	testErrors[0] = 0;
+        testErrorsSize_runtest = 0;
+	testErrors_runtest[0] = 0;
 	extraMemoryFromResolver = 0;
         res = tst->func(NULL, NULL, NULL, tst->options);
 	if (res != 0) {
@@ -4545,7 +4430,7 @@ main(int argc ATTRIBUTE_UNUSED, char **argv ATTRIBUTE_UNUSED) {
 	    verbose = 1;
         else if (!strcmp(argv[a], "-u"))
 	    update_results = 1;
-        else if (!strcmp(argv[a], "-quiet"))
+        else if (!strcmp(argv[a], "-quiet_runtest"))
 	    tests_quiet = 1;
 	else {
 	    for (i = 0; testDescriptions[i].func != NULL; i++) {
