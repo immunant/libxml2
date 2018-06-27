@@ -55,7 +55,7 @@ libxml2_la_SOURCES = SAX.c entities.c encoding.c error.c parserInternals.c  \
 		$(trio_sources) \
 		xmlreader.c relaxng.c dict.c SAX2.c \
 		xmlwriter.c legacy.c chvalid.c pattern.c xmlsave.c \
-		xmlmodule.c schematron.c xzlib.c
+		xmlmodule.c schematron.c xzlib.c variadic.c
 
 DEPS = $(top_builddir)/libxml2.la
 LDADDS = $(STATIC_BINARIES) $(top_builddir)/libxml2.la $(THREAD_LIBS) $(Z_LIBS) $(LZMA_LIBS) $(ICONV_LIBS) $(M_LIBS) $(WIN32_EXTRA_LIBADD)
