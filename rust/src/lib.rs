@@ -6,6 +6,7 @@
 #![feature(extern_types)]
 #![feature(asm)]
 #![feature(used)]
+#![feature(const_slice_as_ptr)]
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
