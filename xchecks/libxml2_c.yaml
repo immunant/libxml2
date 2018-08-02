@@ -1,0 +1,34 @@
+# Cross-check configuration for C libxml2
+---
+# System header
+- file: "**/include/bits/types/__locale_t.h"
+  items:
+    - item: defaults
+      disable_xchecks: true
+
+- file: "**/include/__stddef_max_align_t.h"
+  items:
+    - item: defaults
+      disable_xchecks: true
+
+# libxml2 files
+- file: "xmlschemastypes.c"
+  items:
+    - item: struct
+      name: _xmlSchemaValDate
+      custom_hash: "xcheck_hash_xmlSchemaValDate"
+
+    - item: struct
+      name: _xmlSchemaValDecimal
+      custom_hash: "xcheck_hash_xmlSchemaValDecimal"
+
+- file: variadic.c
+  items:
+    - item: defaults
+      disable_xchecks: true
+
+- file: xchecks/xchecks.c
+  items:
+    - item: defaults
+      disable_xchecks: true
+...
