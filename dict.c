@@ -182,10 +182,11 @@ int __xmlInitializeDict(void) {
 
 #ifdef DICT_RANDOMIZATION
 #ifdef HAVE_RAND_R
-    rand_seed = time(NULL);
+    rand_seed = 0x12345678; //XCHECKS time(NULL);
     rand_r(& rand_seed);
 #else
-    srand(time(NULL));
+    srand(0x12345678);
+    //XCHECKS: srand(time(NULL));
 #endif
 #endif
     xmlDictInitialized = 1;
