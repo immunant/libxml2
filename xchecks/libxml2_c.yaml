@@ -18,6 +18,13 @@
       fields:
           __ss_padding: disabled
 
+- file: "**/pthread.h"
+  items:
+      # The Rust version doesn't call `pthread_equal`, for some reason
+      - item: function
+        name: pthread_equal
+        disable_xchecks: true
+
 # libxml2 files
 - file: "xmlschemastypes.c"
   items:
@@ -93,6 +100,14 @@
     - item: function
       name: xmlParseGetLasts
       all_args: disabled
+
+- file: "dict.c"
+  items:
+      # _xmlDict::strings has pointers to uninitialized data
+      - item: struct
+        name: _xmlDict
+        fields:
+            strings: disabled
 
 # libxml2 headers
 - file: "**/include/libxml/parser.h"

@@ -27,6 +27,60 @@
         fields:
             __ss_padding: disabled
 
+- file: "src/dict.rs"
+  items:
+      # _xmlDict::strings has pointers to uninitialized data
+      - item: struct
+        name: _xmlDict
+        fields:
+            strings: disabled
+
+# Disable cross-checks on run_static_initializers
+- file: "src/chvalid.rs"
+  items:
+      - item: function
+        name: run_static_initializers
+        disable_xchecks: true
+
+- file: "src/HTMLparser.rs"
+  items:
+      - item: function
+        name: run_static_initializers
+        disable_xchecks: true
+
+- file: "src/xmlunicode.rs"
+  items:
+      - item: function
+        name: run_static_initializers
+        disable_xchecks: true
+
+- file: "examples/runtest.rs"
+  items:
+      - item: function
+        name: main
+        disable_xchecks: true
+
+      - item: function
+        name: main_0
+        entry: { djb2: "main" }
+        exit: { djb2: "main" }
+
+      - item: function
+        name: run_static_initializers
+        disable_xchecks: true
+
+- file: "examples/*.rs"
+  priority: -1
+  items:
+      - item: function
+        name: main
+        disable_xchecks: true
+
+      - item: function
+        name: main_0
+        entry: { djb2: "main" }
+        exit: { djb2: "main" }
+
 # TODO: all the exceptions from libxml2_c.yaml
 ...
 
