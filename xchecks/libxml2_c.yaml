@@ -1,12 +1,12 @@
 # Cross-check configuration for C libxml2
 ---
 # System header
-- file: "**/include/bits/types/__locale_t.h"
+- file: "**/bits/types/__locale_t.h"
   items:
     - item: defaults
       disable_xchecks: true
 
-- file: "**/include/__stddef_max_align_t.h"
+- file: "**/__stddef_max_align_t.h"
   items:
     - item: defaults
       disable_xchecks: true
@@ -24,7 +24,7 @@
 
 - file: "parser.c"
   items:
-    # Functions that returns values in xmlChar** parameters
+    # Functions that return values in xmlChar** parameters
     - item: function
       name: xmlParseStringCharRef
       all_args: disabled
