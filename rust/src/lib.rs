@@ -21,6 +21,13 @@
 #![allow(unused_variables)]
 #![allow(unused_attributes)]
 
+#![cfg_attr(feature = "xchecks", feature(plugin, custom_attribute))]
+#![cfg_attr(feature = "xchecks", plugin(cross_check_plugin(config_file = "../xchecks/libxml2_rust.yaml")))]
+#![cfg_attr(feature = "xchecks", cross_check(yes))]
+
+#[cfg(feature = "xchecks")] #[macro_use] extern crate cross_check_derive;
+#[cfg(feature = "xchecks")] #[macro_use] extern crate cross_check_runtime;
+
 pub mod HTMLparser;
 pub mod HTMLtree;
 pub mod SAX;

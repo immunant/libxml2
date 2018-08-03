@@ -11,6 +11,13 @@
     - item: defaults
       disable_xchecks: true
 
+- file: "**/bits/socket.h"
+  items:
+    - item: struct
+      name: sockaddr_storage
+      fields:
+          __ss_padding: disabled
+
 # libxml2 files
 - file: "xmlschemastypes.c"
   items:
@@ -21,6 +28,20 @@
     - item: struct
       name: _xmlSchemaValDecimal
       custom_hash: "xcheck_hash_xmlSchemaValDecimal"
+
+- file: "xmlsave.c"
+  items:
+    - item: struct
+      name: _xmlSaveCtxt
+      fields:
+          indent: disabled
+
+- file: "debugXML.c"
+  items:
+    - item: struct
+      name: _xmlDebugCtxt
+      fields:
+          shift: disabled
 
 - file: "parser.c"
   items:

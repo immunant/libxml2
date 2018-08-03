@@ -1,0 +1,32 @@
+---
+- file: "src/xmlsave.rs"
+  items:
+      - item: struct
+        name: _xmlSaveCtxt
+        fields:
+            indent: disabled
+
+- file: "src/debugXML.rs"
+  items:
+      - item: struct
+        name: _xmlDebugCtxt
+        fields:
+            shift: disabled
+
+- file: "src/nanoftp.rs"
+  items:
+      - item: struct
+        name: sockaddr_storage
+        fields:
+            __ss_padding: disabled
+
+- file: "src/variadic.rs"
+  items:
+      - item: struct
+        name: sockaddr_storage
+        fields:
+            __ss_padding: disabled
+
+# TODO: all the exceptions from libxml2_c.yaml
+...
+
