@@ -10,6 +10,7 @@ fn main() {
     let lib_dir = cargo_dir.join("lib");
     let variadic_c = cargo_dir.join("../variadic.c");
     let xchecks_c = cargo_dir.join("../xchecks/xchecks.c");
+    let libxml2_dir = cargo_dir.join("..");
     let libxml2_include_dir = cargo_dir.join("../include");
     let libvariadic_a = lib_dir.join("libvariadic.a");
 
@@ -25,8 +26,12 @@ fn main() {
         .flag("-c")
         .file(variadic_c)
         .file(xchecks_c)
+        .flag("-DHAVE_CONFIG_H")
+        .flag("-D_REENTRANT")
+        .flag("-DPIC")
         .flag("-fPIC")
         .flag("-w") // Hide warnings; cc will pass them to cargo annoyingly
+        .include(libxml2_dir)
         .include(libxml2_include_dir)
         .out_dir(&lib_dir)
         .compile("variadic");
