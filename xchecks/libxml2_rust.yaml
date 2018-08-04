@@ -1,5 +1,6 @@
 ---
 - file: "src/*.rs"
+  priority: -1
   # Some C structures included in every file
   items:
       - item: struct
@@ -7,6 +8,14 @@
         fields:
             inputTab: disabled
             nodeTab: disabled
+            nameTab: disabled
+            space: disabled
+            spaceTab: disabled
+            atts: disabled
+            nsTab: disabled
+            pushTab: disabled
+            nodeInfo: disabled
+            nodeInfoTab: disabled
 
       # Node fields outside common part
       - item: struct
@@ -178,6 +187,14 @@
         fields:
             inputTab: disabled
             nodeTab: disabled
+            nameTab: disabled
+            space: disabled
+            spaceTab: disabled
+            atts: disabled
+            nsTab: disabled
+            pushTab: disabled
+            nodeInfo: disabled
+            nodeInfoTab: disabled
 
       - item: struct
         name: _xmlDoc
@@ -321,6 +338,14 @@
         fields:
             inputTab: disabled
             nodeTab: disabled
+            nameTab: disabled
+            space: disabled
+            spaceTab: disabled
+            atts: disabled
+            nsTab: disabled
+            pushTab: disabled
+            nodeInfo: disabled
+            nodeInfoTab: disabled
 
       - item: struct
         name: _xmlDoc
@@ -374,6 +399,14 @@
         fields:
             inputTab: disabled
             nodeTab: disabled
+            nameTab: disabled
+            space: disabled
+            spaceTab: disabled
+            atts: disabled
+            nsTab: disabled
+            pushTab: disabled
+            nodeInfo: disabled
+            nodeInfoTab: disabled
 
       - item: struct
         name: _xmlDoc
@@ -431,6 +464,55 @@
         name: run_static_initializers
         disable_xchecks: true
 
+      - item: struct
+        name: _xmlParserCtxt
+        fields:
+            inputTab: disabled
+            nodeTab: disabled
+            nameTab: disabled
+            space: disabled
+            spaceTab: disabled
+            atts: disabled
+            nsTab: disabled
+            pushTab: disabled
+            nodeInfo: disabled
+            nodeInfoTab: disabled
+
+      # Node fields outside common part
+      - item: struct
+        name: _xmlDoc
+        fields:
+            intSubset: disabled
+            extSubset: disabled
+            oldNs: disabled
+            version: disabled
+            encoding: disabled
+            ids: disabled
+            refs: disabled
+            URL: disabled
+            dict: disabled
+            psvi: disabled
+
+      - item: struct
+        name: _xmlDtd
+        fields:
+            notations: disabled
+            elements: disabled
+            attributes: disabled
+            entities: disabled
+            ExternalID: disabled
+            SystemID: disabled
+            pentities: disabled
+
+      - item: struct
+        name: _xmlNode
+        fields:
+            ns: disabled
+            content: disabled
+            properties: disabled
+            nsDef: disabled
+            psvi: disabled
+
 - file: "examples/*.rs"
   priority: -1
   items:
@@ -443,6 +525,54 @@
         entry: { djb2: "main" }
         exit: { djb2: "main" }
 
-# TODO: all the exceptions from libxml2_c.yaml
+      - item: struct
+        name: _xmlParserCtxt
+        fields:
+            inputTab: disabled
+            nodeTab: disabled
+            nameTab: disabled
+            space: disabled
+            spaceTab: disabled
+            atts: disabled
+            nsTab: disabled
+            pushTab: disabled
+            nodeInfo: disabled
+            nodeInfoTab: disabled
+
+      # Node fields outside common part
+      - item: struct
+        name: _xmlDoc
+        fields:
+            intSubset: disabled
+            extSubset: disabled
+            oldNs: disabled
+            version: disabled
+            encoding: disabled
+            ids: disabled
+            refs: disabled
+            URL: disabled
+            dict: disabled
+            psvi: disabled
+
+      - item: struct
+        name: _xmlDtd
+        fields:
+            notations: disabled
+            elements: disabled
+            attributes: disabled
+            entities: disabled
+            ExternalID: disabled
+            SystemID: disabled
+            pentities: disabled
+
+      - item: struct
+        name: _xmlNode
+        fields:
+            ns: disabled
+            content: disabled
+            properties: disabled
+            nsDef: disabled
+            psvi: disabled
+
 ...
 

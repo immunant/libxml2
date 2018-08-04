@@ -117,6 +117,14 @@
       fields:
           inputTab: disabled
           nodeTab: disabled
+          nameTab: disabled
+          space: disabled
+          spaceTab: disabled
+          atts: disabled
+          nsTab: disabled
+          pushTab: disabled
+          nodeInfo: disabled
+          nodeInfoTab: disabled
 
 - file: "**/include/libxml/tree.h"
   items:
