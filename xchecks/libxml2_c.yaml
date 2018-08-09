@@ -119,11 +119,11 @@
 
 - file: "dict.c"
   items:
-      # _xmlDict::strings has pointers to uninitialized data
+      # _xmlDictStrings->end points past the end of the array
       - item: struct
-        name: _xmlDict
+        name: _xmlDictStrings
         fields:
-            strings: disabled
+            end: disabled
 
 # libxml2 headers
 - file: "**/include/libxml/parser.h"
@@ -132,15 +132,8 @@
       name: _xmlParserCtxt
       fields:
           inputTab: disabled
-          nodeTab: disabled
-          nameTab: disabled
           space: disabled
-          spaceTab: disabled
-          atts: disabled
-          nsTab: disabled
-          pushTab: disabled
           nodeInfo: disabled
-          nodeInfoTab: disabled
 
 - file: "**/include/libxml/tree.h"
   items:

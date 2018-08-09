@@ -7,15 +7,8 @@
         name: _xmlParserCtxt
         fields:
             inputTab: disabled
-            nodeTab: disabled
-            nameTab: disabled
             space: disabled
-            spaceTab: disabled
-            atts: disabled
-            nsTab: disabled
-            pushTab: disabled
             nodeInfo: disabled
-            nodeInfoTab: disabled
 
       # Node fields outside common part
       - item: struct
@@ -186,15 +179,8 @@
         name: _xmlParserCtxt
         fields:
             inputTab: disabled
-            nodeTab: disabled
-            nameTab: disabled
             space: disabled
-            spaceTab: disabled
-            atts: disabled
-            nsTab: disabled
-            pushTab: disabled
             nodeInfo: disabled
-            nodeInfoTab: disabled
 
       - item: struct
         name: _xmlDoc
@@ -232,11 +218,11 @@
 
 - file: "src/dict.rs"
   items:
-      # _xmlDict::strings has pointers to uninitialized data
+      # _xmlDictStrings->end points past the end of the array
       - item: struct
-        name: _xmlDict
+        name: _xmlDictStrings
         fields:
-            strings: disabled
+            end: disabled
 
 - file: "src/xmlschemastypes.rs"
   items:
@@ -337,15 +323,8 @@
         name: _xmlParserCtxt
         fields:
             inputTab: disabled
-            nodeTab: disabled
-            nameTab: disabled
             space: disabled
-            spaceTab: disabled
-            atts: disabled
-            nsTab: disabled
-            pushTab: disabled
             nodeInfo: disabled
-            nodeInfoTab: disabled
 
       - item: struct
         name: _xmlDoc
