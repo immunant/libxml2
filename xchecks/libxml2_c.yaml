@@ -25,6 +25,22 @@
         name: pthread_equal
         disable_xchecks: true
 
+- file: "**/bits/types/struct_FILE.h"
+  items:
+      - item: struct
+        name: _IO_FILE
+        fields:
+            _markers: disabled
+            _codecvt: disabled
+            _wide_data: disabled
+
+      - item: struct
+        name: _IO_FILE_complete
+        fields:
+            _markers: disabled
+            _codecvt: disabled
+            _wide_data: disabled
+
 # libxml2 files
 - file: "xmlschemastypes.c"
   items:
