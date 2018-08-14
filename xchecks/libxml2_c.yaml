@@ -66,57 +66,6 @@
       fields:
           shift: disabled
 
-- file: "parser.c"
-  items:
-    # Functions that return values in xmlChar** parameters
-    - item: function
-      name: xmlParseStringCharRef
-      all_args: disabled
-
-    - item: function
-      name: xmlSplitQName
-      all_args: disabled
-
-    - item: function
-      name: xmlParseEntityValue
-      all_args: disabled
-
-    - item: function
-      name: xmlParseExternalID
-      all_args: disabled
-
-    - item: function
-      name: xmlParseDefaultDecl
-      all_args: disabled
-
-    - item: function
-      name: xmlParseStringEntityRef
-      all_args: disabled
-
-    - item: function
-      name: xmlParseStringPEReference
-      all_args: disabled
-
-    - item: function
-      name: xmlParseAttribute
-      all_args: disabled
-
-    - item: function
-      name: xmlParseQName
-      all_args: disabled
-
-    - item: function
-      name: xmlParseAttribute2
-      all_args: disabled
-
-    - item: function
-      name: xmlParseStartTag2
-      all_args: disabled
-
-    - item: function
-      name: xmlParseGetLasts
-      all_args: disabled
-
 - file: "dict.c"
   items:
       # _xmlDictStrings->end points past the end of the array
