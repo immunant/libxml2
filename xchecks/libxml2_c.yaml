@@ -74,6 +74,17 @@
         fields:
             end: disabled
 
+- file: "parser.c"
+  items:
+      # These return an `xmlChar*` which can be equal to `(xmlChar*) 1`
+      - item: function
+        name: xmlParseNameAndCompare
+        return: disabled
+
+      - item: function
+        name: xmlParseQNameAndCompare
+        return: disabled
+
 # libxml2 headers
 - file: "**/include/libxml/parser.h"
   items:
@@ -120,6 +131,44 @@
           properties: disabled
           nsDef: disabled
           psvi: disabled
+
+    # _xmlElementContent::parent may be equal to `(xmlElementContentPtr) 1`
+    - item: struct
+      name: _xmlElementContent
+      fields:
+          parent: disabled
+
+- file: "**/include/libxml/schemasInternals.h"
+  items:
+    # These all overlap with each other in memory,
+    # but have different layouts
+    - item: struct
+      name: _xmlSchemaType
+      custom_hash: "xcheck_hash_xmlSchemaType"
+
+    - item: struct
+      name: _xmlSchemaAttribute
+      custom_hash: "xcheck_hash_xmlSchemaAttribute"
+
+    - item: struct
+      name: _xmlSchemaWildcard
+      custom_hash: "xcheck_hash_xmlSchemaWildcard"
+
+    - item: struct
+      name: _xmlSchemaAttributeGroup
+      custom_hash: "xcheck_hash_xmlSchemaAttributeGroup"
+
+    - item: struct
+      name: _xmlSchemaElement
+      custom_hash: "xcheck_hash_xmlSchemaElement"
+
+    - item: struct
+      name: _xmlSchemaFacet
+      custom_hash: "xcheck_hash_xmlSchemaFacet"
+
+    - item: struct
+      name: _xmlSchemaNotation
+      custom_hash: "xcheck_hash_xmlSchemaNotation"
 
 # Our files
 - file: "variadic.c"
