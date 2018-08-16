@@ -74,17 +74,6 @@
         fields:
             end: disabled
 
-- file: "parser.c"
-  items:
-      # These return an `xmlChar*` which can be equal to `(xmlChar*) 1`
-      - item: function
-        name: xmlParseNameAndCompare
-        return: disabled
-
-      - item: function
-        name: xmlParseQNameAndCompare
-        return: disabled
-
 # libxml2 headers
 - file: "**/include/libxml/parser.h"
   items:
@@ -131,12 +120,6 @@
           properties: disabled
           nsDef: disabled
           psvi: disabled
-
-    # _xmlElementContent::parent may be equal to `(xmlElementContentPtr) 1`
-    - item: struct
-      name: _xmlElementContent
-      fields:
-          parent: disabled
 
 - file: "**/include/libxml/schemasInternals.h"
   items:
