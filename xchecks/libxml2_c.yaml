@@ -41,6 +41,17 @@
             _codecvt: disabled
             _wide_data: disabled
 
+- file: "**/sys/stat.h"
+  items:
+      # On some systems, `stat` is an inline function in `sys/stat.h`
+      - item: function
+        name: stat
+        disable_xchecks: true
+
+      - item: function
+        name: stat64
+        disable_xchecks: true
+
 # libxml2 files
 - file: "xmlschemastypes.c"
   items:
