@@ -14,6 +14,8 @@
       - item: struct
         name: _xmlDoc
         fields:
+            compression: disabled
+            standalone: disabled
             intSubset: disabled
             extSubset: disabled
             oldNs: disabled
@@ -22,8 +24,11 @@
             ids: disabled
             refs: disabled
             URL: disabled
+            charset: disabled
             dict: disabled
             psvi: disabled
+            parseFlags: disabled
+            properties: disabled
 
       - item: struct
         name: _xmlDtd
@@ -44,6 +49,8 @@
             properties: disabled
             nsDef: disabled
             psvi: disabled
+            line: disabled
+            extra: disabled
 
 - file: "src/xmlsave.rs"
   items:
@@ -55,6 +62,8 @@
       - item: struct
         name: _xmlDoc
         fields:
+            compression: disabled
+            standalone: disabled
             intSubset: disabled
             extSubset: disabled
             oldNs: disabled
@@ -63,8 +72,11 @@
             ids: disabled
             refs: disabled
             URL: disabled
+            charset: disabled
             dict: disabled
             psvi: disabled
+            parseFlags: disabled
+            properties: disabled
 
       - item: struct
         name: _xmlDtd
@@ -85,6 +97,8 @@
             properties: disabled
             nsDef: disabled
             psvi: disabled
+            line: disabled
+            extra: disabled
 
 - file: "src/debugXML.rs"
   items:
@@ -96,6 +110,8 @@
       - item: struct
         name: _xmlDoc
         fields:
+            compression: disabled
+            standalone: disabled
             intSubset: disabled
             extSubset: disabled
             oldNs: disabled
@@ -104,8 +120,11 @@
             ids: disabled
             refs: disabled
             URL: disabled
+            charset: disabled
             dict: disabled
             psvi: disabled
+            parseFlags: disabled
+            properties: disabled
 
       - item: struct
         name: _xmlDtd
@@ -126,6 +145,8 @@
             properties: disabled
             nsDef: disabled
             psvi: disabled
+            line: disabled
+            extra: disabled
 
 - file: "src/nanoftp.rs"
   items:
@@ -137,6 +158,8 @@
       - item: struct
         name: _xmlDoc
         fields:
+            compression: disabled
+            standalone: disabled
             intSubset: disabled
             extSubset: disabled
             oldNs: disabled
@@ -145,8 +168,11 @@
             ids: disabled
             refs: disabled
             URL: disabled
+            charset: disabled
             dict: disabled
             psvi: disabled
+            parseFlags: disabled
+            properties: disabled
 
       - item: struct
         name: _xmlDtd
@@ -167,6 +193,8 @@
             properties: disabled
             nsDef: disabled
             psvi: disabled
+            line: disabled
+            extra: disabled
 
 - file: "src/variadic.rs"
   items:
@@ -185,6 +213,8 @@
       - item: struct
         name: _xmlDoc
         fields:
+            compression: disabled
+            standalone: disabled
             intSubset: disabled
             extSubset: disabled
             oldNs: disabled
@@ -193,8 +223,11 @@
             ids: disabled
             refs: disabled
             URL: disabled
+            charset: disabled
             dict: disabled
             psvi: disabled
+            parseFlags: disabled
+            properties: disabled
 
       - item: struct
         name: _xmlDtd
@@ -215,6 +248,8 @@
             properties: disabled
             nsDef: disabled
             psvi: disabled
+            line: disabled
+            extra: disabled
 
 - file: "src/dict.rs"
   items:
@@ -237,6 +272,8 @@
       - item: struct
         name: _xmlDoc
         fields:
+            compression: disabled
+            standalone: disabled
             intSubset: disabled
             extSubset: disabled
             oldNs: disabled
@@ -245,8 +282,11 @@
             ids: disabled
             refs: disabled
             URL: disabled
+            charset: disabled
             dict: disabled
             psvi: disabled
+            parseFlags: disabled
+            properties: disabled
 
       - item: struct
         name: _xmlDtd
@@ -267,6 +307,8 @@
             properties: disabled
             nsDef: disabled
             psvi: disabled
+            line: disabled
+            extra: disabled
 
 - file: "src/parser.rs"
   items:
@@ -280,6 +322,8 @@
       - item: struct
         name: _xmlDoc
         fields:
+            compression: disabled
+            standalone: disabled
             intSubset: disabled
             extSubset: disabled
             oldNs: disabled
@@ -288,8 +332,11 @@
             ids: disabled
             refs: disabled
             URL: disabled
+            charset: disabled
             dict: disabled
             psvi: disabled
+            parseFlags: disabled
+            properties: disabled
 
       - item: struct
         name: _xmlDtd
@@ -310,5 +357,7 @@
             properties: disabled
             nsDef: disabled
             psvi: disabled
+            line: disabled
+            extra: disabled
 
 ...

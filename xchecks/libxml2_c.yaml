@@ -90,6 +90,8 @@
     - item: struct
       name: _xmlDoc
       fields:
+          compression: disabled
+          standalone: disabled
           intSubset: disabled
           extSubset: disabled
           oldNs: disabled
@@ -98,8 +100,11 @@
           ids: disabled
           refs: disabled
           URL: disabled
+          charset: disabled
           dict: disabled
           psvi: disabled
+          parseFlags: disabled
+          properties: disabled
 
     - item: struct
       name: _xmlDtd
@@ -120,6 +125,8 @@
           properties: disabled
           nsDef: disabled
           psvi: disabled
+          line: disabled
+          extra: disabled
 
 - file: "**/include/libxml/schemasInternals.h"
   items:
