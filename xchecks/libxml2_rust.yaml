@@ -52,6 +52,43 @@
             line: disabled
             extra: disabled
 
+      # These all overlap with each other in memory,
+      # but have different layouts
+      - item: struct
+        name: _xmlSchemaType
+        custom_hash: "xcheck_hash_xmlSchemaType"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaAttribute
+        custom_hash: "xcheck_hash_xmlSchemaAttribute"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaWildcard
+        custom_hash: "xcheck_hash_xmlSchemaWildcard"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaAttributeGroup
+        custom_hash: "xcheck_hash_xmlSchemaAttributeGroup"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaElement
+        custom_hash: "xcheck_hash_xmlSchemaElement"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaFacet
+        custom_hash: "xcheck_hash_xmlSchemaFacet"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaNotation
+        custom_hash: "xcheck_hash_xmlSchemaNotation"
+        custom_hash_format: extern
+
 - file: "src/xmlsave.rs"
   items:
       - item: struct
@@ -263,12 +300,52 @@
   items:
       - item: struct
         name: _xmlSchemaValDate
-        #custom_hash: "0xABCD0003u64"
+        custom_hash: "0xABCD0003u64"
+        custom_hash_format: expression
 
       - item: struct
         name: _xmlSchemaValDecimal
-        #custom_hash: "0xABCD0004u64"
+        custom_hash: "0xABCD0004u64"
+        custom_hash_format: expression
 
+      # These all overlap with each other in memory,
+      # but have different layouts
+      - item: struct
+        name: _xmlSchemaType
+        custom_hash: "xcheck_hash_xmlSchemaType"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaAttribute
+        custom_hash: "xcheck_hash_xmlSchemaAttribute"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaWildcard
+        custom_hash: "xcheck_hash_xmlSchemaWildcard"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaAttributeGroup
+        custom_hash: "xcheck_hash_xmlSchemaAttributeGroup"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaElement
+        custom_hash: "xcheck_hash_xmlSchemaElement"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaFacet
+        custom_hash: "xcheck_hash_xmlSchemaFacet"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlSchemaNotation
+        custom_hash: "xcheck_hash_xmlSchemaNotation"
+        custom_hash_format: extern
+
+      # Structures from headers
       - item: struct
         name: _xmlDoc
         fields:
