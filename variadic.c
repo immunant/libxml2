@@ -1,3 +1,6 @@
+#define IN_LIBXML
+#include "libxml.h"
+
 #include <libxml/xmlexports.h>
 #include <libxml/xmlversion.h>
 #include <libxml/xmlerror.h>
@@ -11,7 +14,6 @@
 #include <sys/select.h>
 #endif
 
-#include "libxml.h"
 #include "variadic.h"
 
 // from xmllint.c:
