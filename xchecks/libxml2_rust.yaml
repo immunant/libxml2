@@ -290,10 +290,12 @@
 
 - file: "src/dict.rs"
   items:
-      # _xmlDictStrings->end points past the end of the array
+      # These fields may point past the end of the allocated structure
       - item: struct
         name: _xmlDictStrings
         fields:
+            free: disabled
+            array: disabled
             end: disabled
 
 - file: "src/xmlschemastypes.rs"

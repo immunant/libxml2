@@ -93,10 +93,12 @@
 
 - file: "dict.c"
   items:
-      # _xmlDictStrings->end points past the end of the array
+      # These fields may point past the end of the allocated structure
       - item: struct
         name: _xmlDictStrings
         fields:
+            free: disabled
+            array: disabled
             end: disabled
 
 # libxml2 headers
