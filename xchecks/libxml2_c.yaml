@@ -101,6 +101,18 @@
             array: disabled
             end: disabled
 
+# test files
+- file: "testapi.c"
+  items:
+      # These functions return a FILE*, which is nondeterministic
+      - item: function
+        name: gen_FILE_ptr
+        return: disabled
+
+      - item: function
+        name: gen_debug_FILE_ptr
+        return: disabled
+
 # libxml2 headers
 - file: "**/include/libxml/parser.h"
   items:
