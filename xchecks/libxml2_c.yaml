@@ -52,6 +52,20 @@
         name: stat64
         disable_xchecks: true
 
+- file: "**/bits/byteswap.h"
+  items:
+      - item: function
+        name: __bswap_16
+        disable_xchecks: true
+
+      - item: function
+        name: __bswap_32
+        disable_xchecks: true
+
+      - item: function
+        name: __bswap_64
+        disable_xchecks: true
+
 # libxml2 files
 - file: "xmlschemastypes.c"
   items:
