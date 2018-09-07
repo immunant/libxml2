@@ -13,22 +13,6 @@
         name: pthread_equal
         disable_xchecks: true
 
-- file: "**/bits/types/struct_FILE.h"
-  items:
-      - item: struct
-        name: _IO_FILE
-        fields:
-            _markers: disabled
-            _codecvt: disabled
-            _wide_data: disabled
-
-      - item: struct
-        name: _IO_FILE_complete
-        fields:
-            _markers: disabled
-            _codecvt: disabled
-            _wide_data: disabled
-
 # libxml2 files
 - file: "xmlschemastypes.c"
   items:
@@ -63,18 +47,6 @@
             free: disabled
             array: disabled
             end: disabled
-
-# test files
-- file: "testapi.c"
-  items:
-      # These functions return a FILE*, which is nondeterministic
-      - item: function
-        name: gen_FILE_ptr
-        return: disabled
-
-      - item: function
-        name: gen_debug_FILE_ptr
-        return: disabled
 
 # libxml2 headers
 - file: "**/include/libxml/parser.h"
