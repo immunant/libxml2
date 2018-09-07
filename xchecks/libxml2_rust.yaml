@@ -89,6 +89,12 @@
         custom_hash: "xcheck_hash_xmlSchemaNotation"
         custom_hash_format: extern
 
+      # xmlLastError.ctxt sometimes points to a free'd context
+      - item: struct
+        name: _xmlError
+        fields:
+            ctxt: disabled
+
 - file: "src/xmlsave.rs"
   items:
       - item: struct
