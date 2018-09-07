@@ -6,13 +6,6 @@
     - item: defaults
       disable_xchecks: true
 
-- file: "**/pthread.h"
-  items:
-      # The Rust version doesn't call `pthread_equal`, for some reason
-      - item: function
-        name: pthread_equal
-        disable_xchecks: true
-
 # libxml2 files
 - file: "xmlschemastypes.c"
   items:
