@@ -95,17 +95,6 @@
         fields:
             ctxt: disabled
 
-      # `FILE*` hashes to a fixed value
-      - item: struct
-        name: _IO_FILE
-        custom_hash: "0x72617453454c4946_u64"
-        custom_hash_format: "expression"
-
-      - item: struct
-        name: _IO_FILE_complete
-        custom_hash: "0x72617453454c4946_u64"
-        custom_hash_format: "expression"
-
 - file: "src/xmlsave.rs"
   items:
       - item: struct
@@ -119,20 +108,6 @@
         name: _xmlDebugCtxt
         fields:
             shift: disabled
-
-- file: "src/nanoftp.rs"
-  items:
-      - item: struct
-        name: sockaddr_storage
-        fields:
-            __ss_padding: disabled
-
-- file: "src/variadic.rs"
-  items:
-      - item: struct
-        name: sockaddr_storage
-        fields:
-            __ss_padding: disabled
 
 - file: "src/dict.rs"
   items:
