@@ -59,6 +59,15 @@
             endvalue: disabled
             attrs: disabled
 
+- file: "xmlmemory.c"
+  items:
+    # We get a divergence on the value of `xmlMemUsed` because
+    # we allocate more memory for `_xmlSchemaVal`:
+    # the structure takes 48 bytes in C, but 56 in Rust
+    - item: function
+      name: "xmlMemUsed"
+      return: disabled
+
 # libxml2 headers
 - file: "**/include/libxml/parser.h"
   items:
