@@ -41,6 +41,11 @@
         custom_hash: "xcheck_hash_xmlElement"
         custom_hash_format: extern
 
+      - item: struct
+        name: _xmlNs
+        custom_hash: "xcheck_hash_xmlNs"
+        custom_hash_format: extern
+
       # These all overlap with each other in memory,
       # but have different layouts
       - item: struct
