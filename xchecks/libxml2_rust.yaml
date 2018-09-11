@@ -126,4 +126,22 @@
         custom_hash: "0xABCD0004u64"
         custom_hash_format: expression
 
+- file: "src/relaxng.rs"
+  items:
+      - item: struct
+        name: _xmlRelaxNGDefine
+        fields:
+            # attrs might contain a `xmlSchemaVal` instead
+            attrs: disabled
+
+      - item: struct
+        name: _xmlRelaxNGValidState
+        fields:
+            # These fields may point to free'd structures
+            node: disabled
+            seq: disabled
+            value: disabled
+            endvalue: disabled
+            attrs: disabled
+
 ...

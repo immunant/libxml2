@@ -41,6 +41,24 @@
             array: disabled
             end: disabled
 
+- file: "relaxng.c"
+  items:
+      - item: struct
+        name: _xmlRelaxNGDefine
+        fields:
+            # attrs might contain a `xmlSchemaVal` instead
+            attrs: disabled
+
+      - item: struct
+        name: _xmlRelaxNGValidState
+        fields:
+            # These fields may point to free'd structures
+            node: disabled
+            seq: disabled
+            value: disabled
+            endvalue: disabled
+            attrs: disabled
+
 # libxml2 headers
 - file: "**/include/libxml/parser.h"
   items:
