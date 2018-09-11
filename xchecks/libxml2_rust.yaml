@@ -13,44 +13,33 @@
       # Node fields outside common part
       - item: struct
         name: _xmlDoc
-        fields:
-            compression: disabled
-            standalone: disabled
-            intSubset: disabled
-            extSubset: disabled
-            oldNs: disabled
-            version: disabled
-            encoding: disabled
-            ids: disabled
-            refs: disabled
-            URL: disabled
-            charset: disabled
-            dict: disabled
-            psvi: disabled
-            parseFlags: disabled
-            properties: disabled
+        custom_hash: "xcheck_hash_xmlDoc"
+        custom_hash_format: extern
 
       - item: struct
         name: _xmlDtd
-        fields:
-            notations: disabled
-            elements: disabled
-            attributes: disabled
-            entities: disabled
-            ExternalID: disabled
-            SystemID: disabled
-            pentities: disabled
+        custom_hash: "xcheck_hash_xmlDtd"
+        custom_hash_format: extern
 
       - item: struct
         name: _xmlNode
-        fields:
-            ns: disabled
-            content: disabled
-            properties: disabled
-            nsDef: disabled
-            psvi: disabled
-            line: disabled
-            extra: disabled
+        custom_hash: "xcheck_hash_xmlNode"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlAttr
+        custom_hash: "xcheck_hash_xmlAttr"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlAttribute
+        custom_hash: "xcheck_hash_xmlAttribute"
+        custom_hash_format: extern
+
+      - item: struct
+        name: _xmlElement
+        custom_hash: "xcheck_hash_xmlElement"
+        custom_hash_format: extern
 
       # These all overlap with each other in memory,
       # but have different layouts

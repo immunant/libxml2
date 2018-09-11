@@ -44,3 +44,31 @@ uint64_t xcheck_hash_xmlSchemaFacet(void *x, size_t depth) {
 uint64_t xcheck_hash_xmlSchemaNotation(void *x, size_t depth) {
     return (0xABCD0005ULL << 32) | (*(uint32_t*)x);
 }
+
+struct _xmlNodeCommon {
+    void *ptr1;
+    unsigned type;
+};
+
+uint64_t xcheck_hash_xmlNode(void *x, size_t depth) {
+    struct _xmlNodeCommon *nc = (struct _xmlNodeCommon*) x;
+    return ((0xABCD0006ULL) << 32) | nc->type;
+}
+
+uint64_t xcheck_hash_xmlDoc(void *x, size_t depth)
+    __attribute__((alias("xcheck_hash_xmlNode")));
+
+uint64_t xcheck_hash_xmlDtd(void *x, size_t depth)
+    __attribute__((alias("xcheck_hash_xmlNode")));
+
+uint64_t xcheck_hash_xmlAttr(void *x, size_t depth)
+    __attribute__((alias("xcheck_hash_xmlNode")));
+
+uint64_t xcheck_hash_xmlAttribute(void *x, size_t depth)
+    __attribute__((alias("xcheck_hash_xmlNode")));
+
+uint64_t xcheck_hash_xmlElement(void *x, size_t depth)
+    __attribute__((alias("xcheck_hash_xmlNode")));
+
+uint64_t xcheck_hash_xmlNs(void *x, size_t depth)
+    __attribute__((alias("xcheck_hash_xmlNode")));
