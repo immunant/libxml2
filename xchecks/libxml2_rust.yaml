@@ -82,7 +82,13 @@
       - item: struct
         name: _xmlError
         fields:
+            str1: disabled
+            str2: disabled
+            str3: disabled
+            int1: disabled
+            int2: disabled
             ctxt: disabled
+            node: disabled
 
 - file: "src/xmlsave.rs"
   items:

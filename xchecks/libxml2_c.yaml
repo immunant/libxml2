@@ -116,11 +116,17 @@
 
 - file: "**/include/libxml/xmlerror.h"
   items:
-    # xmlLastError.ctxt sometimes points to a free'd context
+    # xmlLastError fields sometimes point to free'd data
     - item: struct
       name: _xmlError
       fields:
+          str1: disabled
+          str2: disabled
+          str3: disabled
+          int1: disabled
+          int2: disabled
           ctxt: disabled
+          node: disabled
 
 # Our files
 - file: "variadic.c"
