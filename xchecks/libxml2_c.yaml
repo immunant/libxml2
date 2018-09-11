@@ -150,10 +150,16 @@
           str1: disabled
           str2: disabled
           str3: disabled
-          int1: disabled
-          int2: disabled
           ctxt: disabled
           node: disabled
+          # int1 would normally be fine, except `xmlXPathErr` sets it to
+          # `ctxt->cur - ctxt->base` which would normally be fine, since
+          # `ctxt->cur` should be equal to `ctxt->base + D` for some small
+          # offset `D`. However, the `xmlXPtrEvalXPtrPart` function in
+          # `xpointer.c` manually sets `ctxt->cur` to another pointer without
+          # updating `ctxt->base`, so `int1` here sometimes becomes the
+          # difference between 2 completely unrelated pointers.
+          int1: disabled
 
 # Our files
 - file: "variadic.c"
@@ -165,4 +171,5 @@
   items:
     - item: defaults
       disable_xchecks: true
+
 ...
