@@ -2,6 +2,7 @@
 #![feature(i128_type)]
 #![feature(const_ptr_null)]
 #![feature(offset_to)]
+#![feature(ptr_wrapping_offset_from)]
 #![feature(const_ptr_null_mut)]
 #![feature(extern_types)]
 #![feature(asm)]
