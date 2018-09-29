@@ -3,8 +3,9 @@ name = "libxml2-rs"
 version = "0.1.0"
 
 [features]
-xchecks = ["cross-check-plugin", "cross-check-derive", "cross-check-runtime",
-           "xcheck-dlsym"]
+xchecks = ["cross-check-plugin", "cross-check-derive", "cross-check-runtime"]
+xcheck-with-dlsym = ["xcheck-dlsym"]
+xcheck-mvee = ["libclevrbuf-sys"]
 
 [dependencies.cross-check-plugin]
 path = "../../../../cross-checks/rust-checks/rustc-plugin"
@@ -22,6 +23,10 @@ optional = true
 
 [dependencies.xcheck-dlsym]
 path = "../../../../cross-checks/rust-checks/backends/xcheck-dlsym"
+optional = true
+
+[dependencies.libclevrbuf-sys]
+path = "../../../../cross-checks/rust-checks/backends/libclevrbuf-sys"
 optional = true
 
 [build-dependencies]

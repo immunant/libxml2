@@ -29,7 +29,8 @@
 
 #[cfg(feature = "xchecks")] #[macro_use] extern crate cross_check_derive;
 #[cfg(feature = "xchecks")] #[macro_use] extern crate cross_check_runtime;
-#[cfg(feature = "xchecks")] extern crate xcheck_dlsym;
+#[cfg(feature = "xcheck-with-dlsym")] extern crate xcheck_dlsym;
+#[cfg(feature = "xcheck-mvee")] extern crate libclevrbuf_sys;
 
 pub mod HTMLparser;
 pub mod HTMLtree;
