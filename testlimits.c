@@ -623,6 +623,9 @@ testStructuredErrorHandler(void *ctx  ATTRIBUTE_UNUSED, xmlErrorPtr err) {
         }
     }
     if ((domain == XML_FROM_XPATH) && (err->str1 != NULL) &&
+#if 1 // Added for C2Rust
+        (err->int1 >= 0) &&
+#endif
         (err->int1 < 100) &&
 	(err->int1 < xmlStrlen((const xmlChar *)err->str1))) {
 	xmlChar buf[150];
