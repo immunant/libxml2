@@ -6,6 +6,11 @@
     - item: defaults
       disable_xchecks: true
 
+- file: "/usr/include/python*/**"
+  items:
+    - item: defaults
+      disable_xchecks: true
+
 # libxml2 files
 - file: "xmlschemastypes.c"
   items:
