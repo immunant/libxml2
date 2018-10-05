@@ -27,6 +27,8 @@
                                                            djb2_names_file = "../xchecks/djb2_names_libxml2.yaml")))]
 #![cfg_attr(feature = "xchecks", cross_check(yes))]
 
+extern crate libc;
+
 #[cfg(feature = "xchecks")] #[macro_use] extern crate cross_check_derive;
 #[cfg(feature = "xchecks")] #[macro_use] extern crate cross_check_runtime;
 #[cfg(feature = "xcheck-with-dlsym")] extern crate xcheck_dlsym;
