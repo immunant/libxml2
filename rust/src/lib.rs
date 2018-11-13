@@ -23,14 +23,14 @@
 #![allow(unused_attributes)]
 
 #![cfg_attr(feature = "xchecks", feature(plugin, custom_attribute))]
-#![cfg_attr(feature = "xchecks", plugin(cross_check_plugin(config_file = "../xchecks/libxml2_rust.yaml",
-                                                           djb2_names_file = "../xchecks/djb2_names_libxml2.yaml")))]
+#![cfg_attr(feature = "xchecks", plugin(c2rust_xcheck_plugin(config_file = "../xchecks/libxml2_rust.yaml",
+                                                             djb2_names_file = "../xchecks/djb2_names_libxml2.yaml")))]
 #![cfg_attr(feature = "xchecks", cross_check(yes))]
 
 extern crate libc;
 
-#[cfg(feature = "xchecks")] #[macro_use] extern crate cross_check_derive;
-#[cfg(feature = "xchecks")] #[macro_use] extern crate cross_check_runtime;
+#[cfg(feature = "xchecks")] #[macro_use] extern crate c2rust_xcheck_derive;
+#[cfg(feature = "xchecks")] #[macro_use] extern crate c2rust_xcheck_runtime;
 #[cfg(feature = "xcheck-with-dlsym")] extern crate xcheck_dlsym;
 #[cfg(feature = "xcheck-mvee")] extern crate libclevrbuf_sys;
 

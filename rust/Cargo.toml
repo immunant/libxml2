@@ -3,29 +3,29 @@ name = "libxml2-rs"
 version = "0.1.0"
 
 [features]
-xchecks = ["cross-check-plugin", "cross-check-derive", "cross-check-runtime"]
-xcheck-with-dlsym = ["xcheck-dlsym"]
-xcheck-mvee = ["libclevrbuf-sys"]
+xchecks = ["c2rust-xcheck-plugin", "c2rust-xcheck-derive", "c2rust-xcheck-runtime"]
+xcheck-with-dlsym = ["c2rust-xcheck-dlsym"]
+xcheck-mvee = ["c2rust-xcheck-libclevrbuf-sys"]
 
-[dependencies.cross-check-plugin]
+[dependencies.c2rust-xcheck-plugin]
 path = "../../../../cross-checks/rust-checks/rustc-plugin"
 features = ["c-hash-functions"]
 optional = true
 
-[dependencies.cross-check-derive]
+[dependencies.c2rust-xcheck-derive]
 path = "../../../../cross-checks/rust-checks/derive-macros"
 optional = true
 
-[dependencies.cross-check-runtime]
+[dependencies.c2rust-xcheck-runtime]
 path = "../../../../cross-checks/rust-checks/runtime"
 features = ["libc-hash", "fixed-length-array-hash"]
 optional = true
 
-[dependencies.xcheck-dlsym]
+[dependencies.c2rust-xcheck-dlsym]
 path = "../../../../cross-checks/rust-checks/backends/xcheck-dlsym"
 optional = true
 
-[dependencies.libclevrbuf-sys]
+[dependencies.c2rust-xcheck-libclevrbuf-sys]
 path = "../../../../cross-checks/rust-checks/backends/libclevrbuf-sys"
 optional = true
 
