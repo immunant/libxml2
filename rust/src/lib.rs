@@ -1,13 +1,8 @@
 #![feature(libc)]
-#![feature(i128_type)]
-#![feature(const_ptr_null)]
-#![feature(offset_to)]
 #![feature(ptr_wrapping_offset_from)]
-#![feature(const_ptr_null_mut)]
 #![feature(extern_types)]
 #![feature(asm)]
-#![feature(used)]
-#![feature(const_slice_as_ptr)]
+#![feature(label_break_value)]
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
@@ -27,6 +22,7 @@
                                                              djb2_names_file = "../xchecks/djb2_names_libxml2.yaml")))]
 #![cfg_attr(feature = "xchecks", cross_check(yes))]
 
+extern crate c2rust_bitfields;
 extern crate libc;
 
 #[cfg(feature = "xchecks")] #[macro_use] extern crate c2rust_xcheck_derive;
