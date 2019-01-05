@@ -8,7 +8,8 @@ SCRIPT_DIR=`dirname $0`
 C2RUST_DIR=`readlink -f $SCRIPT_DIR/../../../..`
 MACHINE=`uname -n`
 CC_WRAPPER="$C2RUST_DIR/cross-checks/c-checks/clang-plugin/cc_wrapper.sh"
-CC="$C2RUST_DIR/dependencies/llvm-6.0.1/build.$MACHINE/bin/clang"
+#CC="$C2RUST_DIR/dependencies/llvm-6.0.1/build.$MACHINE/bin/clang"
+CC="/usr/bin/clang"
 XCHECK_PLUGIN="$C2RUST_DIR/dependencies/clang-xcheck-plugin.$MACHINE/plugin/CrossChecks.so"
 XCHECK_RUNTIME="$C2RUST_DIR/dependencies/clang-xcheck-plugin.$MACHINE/runtime/libruntime.a"
 
