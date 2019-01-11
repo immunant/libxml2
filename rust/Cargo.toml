@@ -7,8 +7,8 @@ c2rust-bitfields = { path = "../../../../c2rust-bitfields" }
 
 [features]
 xchecks = ["c2rust-xcheck-plugin", "c2rust-xcheck-derive", "c2rust-xcheck-runtime"]
-xcheck-with-dlsym = ["c2rust-xcheck-dlsym"]
-xcheck-mvee = ["c2rust-xcheck-libclevrbuf-sys"]
+xcheck-with-dlsym = ["c2rust-xcheck-backend-dynamic-dlsym"]
+xcheck-mvee = ["c2rust-xcheck-backend-libclevrbuf-sys"]
 
 [dependencies.c2rust-xcheck-plugin]
 path = "../../../../cross-checks/rust-checks/rustc-plugin"
@@ -24,11 +24,11 @@ path = "../../../../cross-checks/rust-checks/runtime"
 features = ["libc-hash", "fixed-length-array-hash"]
 optional = true
 
-[dependencies.c2rust-xcheck-dlsym]
-path = "../../../../cross-checks/rust-checks/backends/xcheck-dlsym"
+[dependencies.c2rust-xcheck-backend-dynamic-dlsym]
+path = "../../../../cross-checks/rust-checks/backends/dynamic-dlsym"
 optional = true
 
-[dependencies.c2rust-xcheck-libclevrbuf-sys]
+[dependencies.c2rust-xcheck-backend-libclevrbuf-sys]
 path = "../../../../cross-checks/rust-checks/backends/libclevrbuf-sys"
 optional = true
 
