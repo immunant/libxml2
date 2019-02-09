@@ -23,6 +23,7 @@
 #![cfg_attr(feature = "xchecks", cross_check(yes))]
 
 extern crate c2rust_bitfields;
+extern crate f128;
 extern crate libc;
 
 #[cfg(feature = "xchecks")] #[macro_use] extern crate c2rust_xcheck_derive;

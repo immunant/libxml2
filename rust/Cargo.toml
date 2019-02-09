@@ -4,6 +4,7 @@ version = "0.1.0"
 
 [dependencies]
 c2rust-bitfields = { path = "../../../../c2rust-bitfields" }
+f128 = "0.2.2"
 
 [features]
 xchecks = ["c2rust-xcheck-plugin", "c2rust-xcheck-derive", "c2rust-xcheck-runtime"]
