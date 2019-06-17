@@ -1,6 +1,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifdef __linux__
+// Cross-checks are only supported on Linux,
+// and this doesn't compile on Mac OS anyway
+
 uint64_t __c2rust_hash_internal_state_struct(void *x, size_t depth) {
     return 0xABCD0001;
 }
@@ -72,3 +76,5 @@ uint64_t xcheck_hash_xmlElement(void *x, size_t depth)
 
 uint64_t xcheck_hash_xmlNs(void *x, size_t depth)
     __attribute__((alias("xcheck_hash_xmlNode")));
+
+#endif // __linux__
